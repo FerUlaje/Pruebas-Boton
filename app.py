@@ -29,7 +29,6 @@ filtro_entrega_produccion = data_diseño['Proceso'] == 'Producción'
 data_diseño_entrega_produccion = data_diseño.loc[filtro_entrega_produccion]
 data_diseño_entrega_produccion['Fecha'] = pd.to_datetime(data_diseño_entrega_produccion['Fecha'])
 data_diseño_entrega_produccion_24 = data_diseño_entrega_produccion[data_diseño_entrega_produccion['Fecha'].dt.year == 2024]
-data_diseño_entrega_produccion_24
 data_diseño_entrega_produccion_24['month'] = data_diseño_entrega_produccion_24['Fecha'].dt.month.map(meses_español)
 diseño_pivot_prod = pd.pivot_table(data_diseño_entrega_produccion_24, values='ML Realizados', index='month', aggfunc='sum')
 
