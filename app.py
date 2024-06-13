@@ -22,10 +22,8 @@ ventas_cierre_trato = cierre_trato_df['VENTA'].sum() # obteniendo total de venta
 ventas_cierre_trato_pivot = pd.pivot_table(cierre_trato_df, 
                                            values='VENTA', 
                                            index='MES', 
-                                           aggfunc="sum", 
-                                           margins=True, 
-                                           margins_name='Total')
-formato_ventas_cierre_trato_pivot = ventas_cierre_trato_pivot.applymap(lambda x: '${:,.0f}'.format(x))
+                                           aggfunc="sum")
+ventas_cierre_trato_pivot['VENTA'] = ventas_cierre_trato_pivot['VENTA'].astype(int)
 
 # ventas diseño entrega a cliente
 entrega_diseño_df = data_ventas[data_ventas['TIPO VENTA'] == 'ENTREGA DISEÑO']
@@ -33,9 +31,8 @@ ventas_entrega_diseño = entrega_diseño_df['VENTA'].sum()
 ventas_entrega_diseño_pivot = pd.pivot_table(entrega_diseño_df,
                                              values='VENTA',
                                              index='MES',
-                                             aggfunc="sum",
-                                             margins=True,
-                                             margins_name='Total')
+                                             aggfunc="sum")
+ventas_entrega_diseño_pivot['VENTA'] = ventas_entrega_diseño_pivot['VENTA'].astype(int)
 
 # ventas inicio producción
 inicio_prod_df = data_ventas[data_ventas['TIPO VENTA'] == 'INICIO PRODUCCIÓN']
@@ -43,9 +40,8 @@ ventas_inicio_prod = inicio_prod_df['VENTA'].sum() # obteniendo total de ventas 
 ventas_inicio_prod_pivot = pd.pivot_table(inicio_prod_df,
                                           values='VENTA',
                                           index='MES',
-                                          aggfunc='sum',
-                                          margins=True,
-                                          margins_name='Total')
+                                          aggfunc='sum')
+ventas_inicio_prod_pivot['VENTA'] = ventas_inicio_prod_pivot['VENTA'].astype(int)
 
 # ventas inicio instalación
 inicio_instal_df = data_ventas[data_ventas['TIPO VENTA'] == 'INICIO INSTALACIÓN']
@@ -53,9 +49,8 @@ ventas_inicio_instal = inicio_instal_df['VENTA'].sum()
 ventas_inicio_instal_pivot = pd.pivot_table(inicio_instal_df,
                                             values='VENTA',
                                             index='MES',
-                                            aggfunc='sum',
-                                            margins=True,
-                                            margins_name='Total')
+                                            aggfunc='sum')
+ventas_inicio_instal_pivot['VENTA'] = ventas_inicio_instal_pivot['VENTA'].astype(int)
 
 # ventas finalización
 finalizacion_df = data_ventas[data_ventas['TIPO VENTA'] == 'FINALIZACIÓN']
@@ -63,9 +58,8 @@ ventas_finalizacion = finalizacion_df['VENTA'].sum()
 ventas_finalizacion_pivot = pd.pivot_table(finalizacion_df,
                                            values='VENTA',
                                            index='MES',
-                                           aggfunc='sum',
-                                           margins=True,
-                                           margins_name='Total')
+                                           aggfunc='sum')
+ventas_finalizacion_pivot['VENTA'] = ventas_finalizacion_pivot['VENTA'].astype(int)
 
 
 ## datos de diseño
@@ -94,17 +88,41 @@ if page == 'Datos Financieros':
     financial_option = st.radio('Menu' ,financieros, label_visibility='collapsed', index=None)
     if financial_option == 'Ventas':
         st.subheader('Ventas', divider='blue')
+
+
         st.write('Ventas por **Cierre de Trato**: ', ventas_cierre_trato.astype(int))
-        ventas_cierre_trato_pivot
-        fig = px.line(ventas_cierre_trato_pivot, y='VENTA', title='Ventas Cierre Trato')
+        fig = px.line(ventas_cierre_trato_pivot, y='VENTA', title='Ventas Cierre Trato', markers=True, line_shape='spline', text='VENTA')
+        fig.update_layout(yaxis=dict(showgrid=False))
+        fig.update_traces(textposition='top center')
         st.plotly_chart(fig)
+        ventas_cierre_trato_pivot
+
         st.write('Ventas por **Entrega de Diseño**:', ventas_entrega_diseño.astype(int))
+        fig2 = px.line(ventas_entrega_diseño_pivot, y='VENTA', title='Ventas Entrega Diseño', markers=True, line_shape='spline', text='VENTA')
+        fig2.update_layout(yaxis=dict(showgrid=False))
+        fig2.update_traces(textposition='top center')
+        st.plotly_chart(fig2)
         ventas_entrega_diseño_pivot
+
         st.write('Ventas por **Inicio de Producción**:', ventas_inicio_prod.astype(int))
+        fig3 = px.line(ventas_inicio_prod_pivot, y='VENTA', title='Ventas Inicio Producción', markers=True, line_shape='spline', text='VENTA')
+        fig3.update_layout(yaxis=dict(showgrid=False))
+        fig3.update_traces(textposition='top center')
+        st.plotly_chart(fig3)
         ventas_inicio_prod_pivot
+
         st.write('Ventas por **Inicio de Instalación**:', ventas_inicio_instal.astype(int))
+        fig4 = px.line(ventas_inicio_instal_pivot, y='VENTA', title='Ventas Inicio Instalación', markers=True, line_shape='spline', text='VENTA')
+        fig4.update_layout(yaxis=dict(showgrid=False))
+        fig4.update_traces(textposition='top center')
+        st.plotly_chart(fig4)
         ventas_inicio_instal_pivot
+
         st.write('Ventas por **Finalización**:', ventas_finalizacion.astype(int))
+        fig5 = px.line(ventas_finalizacion_pivot, y='VENTA', title='Ventas Finalización', markers=True, line_shape='spline', text='VENTA')
+        fig5.update_layout(yaxis=dict(showgrid=False))
+        fig5.update_traces(textposition='top center')
+        st.plotly_chart(fig5)
         ventas_finalizacion_pivot
     if financial_option == 'Control de gastos':
         cat_gastos = ['Administrativos', 'Operativos']
