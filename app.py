@@ -7,10 +7,32 @@ st.header('Reporte de Resultados', divider='red')
 datos_vorivost = ['Datos Financieros', 'Datos Operativos']
 page = st.radio('Menu', datos_vorivost, index=None, label_visibility='collapsed')
 
-data_diseño = pd.read_excel('./datasets/diseño.xlsx', index_col=0) # leyenfo archivo Excel
+# diccionario de meses en español
+meses_español = {
+    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
+    7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+}
+
+## datos de diseño
+# diseño entrega a cliente
+data_diseño = pd.read_excel('./datasets/diseño.xlsx') # leyenfo archivo Excel
 filtro_entrega_cliente = data_diseño['Proceso'] == 'Entregable a Cliente' # filtro de Entregable a cliente
 data_diseño_entrega_cliente = data_diseño.loc[filtro_entrega_cliente]
-diseño_pivot = pd.pivot_table(data_diseño_entrega_cliente, values='ML Realizados', index='Mes', aggfunc=sum)
+data_diseño_entrega_cliente['Fecha'] = pd.to_datetime(data_diseño_entrega_cliente['Fecha'])
+data_diseño_entrega_cliente_24 = data_diseño_entrega_cliente[data_diseño_entrega_cliente['Fecha'].dt.year == 2024]
+# data_diseño_entrega_cliente_24 = data_diseño_entrega_cliente_24.sort_values(by='Fecha')
+data_diseño_entrega_cliente_24['month'] = data_diseño_entrega_cliente_24['Fecha'].dt.month.map(meses_español)
+diseño_pivot = pd.pivot_table(data_diseño_entrega_cliente_24, values='ML Realizados', index='month', aggfunc=sum)
+
+# diseño entrega a producción
+filtro_entrega_produccion = data_diseño['Proceso'] == 'Producción'
+data_diseño_entrega_produccion = data_diseño.loc[filtro_entrega_produccion]
+data_diseño_entrega_produccion['Fecha'] = pd.to_datetime(data_diseño_entrega_produccion['Fecha'])
+data_diseño_entrega_produccion_24 = data_diseño_entrega_produccion[data_diseño_entrega_produccion['Fecha'].dt.year == 2024]
+data_diseño_entrega_produccion_24
+data_diseño_entrega_produccion_24['month'] = data_diseño_entrega_produccion_24['Fecha'].dt.month.map(meses_español)
+diseño_pivot_prod = pd.pivot_table(data_diseño_entrega_produccion_24, values='ML Realizados', index='month', aggfunc='sum')
+
 
 if page == 'Datos Financieros':
     financieros = ['Ventas', 'Control de gastos', 'Estado de Resultados']
@@ -47,5 +69,9 @@ if page == 'Datos Operativos':
     operativas = ['Diseño', 'Producción', 'Instalación']
     operation_option = st.radio('Menu', operativas, index=None, label_visibility='collapsed')
     if operation_option == 'Diseño':
-        st.subheader('Diseño')
+        st.subheader('ML Entregados a Clientes', divider='green')
         diseño_clientes_chart = st.line_chart(diseño_pivot)
+        diseño_pivot
+        st.subheader('ML Entregados a Producción', divider='rainbow')
+        diseño_prod_chart = st.line_chart(diseño_pivot_prod)
+        diseño_pivot_prod
