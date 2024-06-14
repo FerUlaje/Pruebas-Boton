@@ -82,6 +82,25 @@ data_diseño_entrega_produccion_24['month'] = data_diseño_entrega_produccion_24
 diseño_pivot_prod = pd.pivot_table(data_diseño_entrega_produccion_24, values='ML Realizados', index='month', aggfunc='sum')
 
 
+## Egresos
+data_egresos = pd.read_excel('./datasets/egresos_vori_vost_2024.xlsx')
+data_egresos['Fecha'] = pd.to_datetime(data_egresos['Fecha'])
+data_egresos['mes'] = data_egresos['Fecha'].dt.month.map(meses_español)
+filtro_egresos_admin = data_egresos['Categoría'] == 'GTO_ADMON'
+filtro_egresos_gto_oper = data_egresos['Categoría'] == 'GTO_OPERATIVO'
+data_egresos_gto_oper = data_egresos.loc[filtro_egresos_gto_oper]
+gto_oper_pivot = pd.pivot_table(data_egresos_gto_oper,
+                                values='Monto',
+                                index='Subcategoría',
+                                columns='mes',
+                                aggfunc='sum')
+
+
+## Función para aplicar formato condicional
+def apply_color(val):
+    color = 'background-color: {}'.format('#ff9999') if val < 200 else ('background-color: {}'.format('#99ff99') if val > 400 else 'background-color: {}'.format('#ffff99'))
+    return color
+
 if page == 'Datos Financieros':
     financieros = ['Ventas', 'Control de gastos', 'Estado de Resultados']
     st.subheader(page)
@@ -128,6 +147,7 @@ if page == 'Datos Financieros':
         cat_gastos = ['Administrativos', 'Operativos']
         cat = st.radio('Gastos:', cat_gastos, index=None)
         if cat == 'Administrativos':
+            
             st.subheader('Gastos: Administrativos', divider='rainbow')
             st.write('Comisiones MP:')
             st.write('IMSS/INFONAVIT:')
@@ -135,6 +155,8 @@ if page == 'Datos Financieros':
             st.write('Oficinas:')
             st.write('Bonos:')
         if cat == 'Operativos':
+            styled_gto_oper = gto_oper_pivot.style.applymap(apply_color)
+            st.dataframe(styled_gto_oper)
             st.subheader('Gastos: Operativos', divider='green')
             st.write('Destajo')
             st.write('Horas Extras')
