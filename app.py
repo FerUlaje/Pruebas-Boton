@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import matplotlib
 
 st.title("Comercializadora Integral :red[Vori Vost], S.A. de C.V.")
 st.header('Reporte de Resultados', divider='red')
@@ -86,20 +87,44 @@ diseño_pivot_prod = pd.pivot_table(data_diseño_entrega_produccion_24, values='
 data_egresos = pd.read_excel('./datasets/egresos_vori_vost_2024.xlsx')
 data_egresos['Fecha'] = pd.to_datetime(data_egresos['Fecha'])
 data_egresos['mes'] = data_egresos['Fecha'].dt.month.map(meses_español)
+
 filtro_egresos_admin = data_egresos['Categoría'] == 'GTO_ADMON'
+data_egresos_gto_admin = data_egresos.loc[filtro_egresos_admin]
+
 filtro_egresos_gto_oper = data_egresos['Categoría'] == 'GTO_OPERATIVO'
 data_egresos_gto_oper = data_egresos.loc[filtro_egresos_gto_oper]
+
 gto_oper_pivot = pd.pivot_table(data_egresos_gto_oper,
                                 values='Monto',
                                 index='Subcategoría',
                                 columns='mes',
                                 aggfunc='sum')
 
+gto_admon_pivot = pd.pivot_table(data_egresos,
+                                 values='Monto',
+                                 index='Subcategoría',
+                                 columns='mes',
+                                 aggfunc='sum')
+
 
 ## Función para aplicar formato condicional
 def apply_color(val):
     color = 'background-color: {}'.format('#ff9999') if val < 200 else ('background-color: {}'.format('#99ff99') if val > 400 else 'background-color: {}'.format('#ffff99'))
     return color
+
+# aplicar el formato condicional por filas
+def magnify():
+    return [dict(selector="th",
+                 props=[("font-size", "4pt")]),
+            dict(selector="td",
+                 props=[('padding', "0em 0em")]),
+            dict(selector="th:hover",
+                 props=[("font-size", "12pt")]),
+            dict(selector="tr:hover td:hover",
+                 props=[('max-width', '200px'),
+                        ('font-size', '12pt')])
+]
+
 
 if page == 'Datos Financieros':
     financieros = ['Ventas', 'Control de gastos', 'Estado de Resultados']
@@ -147,7 +172,11 @@ if page == 'Datos Financieros':
         cat_gastos = ['Administrativos', 'Operativos']
         cat = st.radio('Gastos:', cat_gastos, index=None)
         if cat == 'Administrativos':
-            
+            # aplicar formato condicional por filas
+            styled_pivot_admon = gto_admon_pivot.style.background_gradient(cmap='viridis',
+                                                                           low=.5,
+                                                                           high=0).format("{:,.of}").set_table_styles(magnify())
+            st.dataframe(styled_pivot_admon)
             st.subheader('Gastos: Administrativos', divider='rainbow')
             st.write('Comisiones MP:')
             st.write('IMSS/INFONAVIT:')
@@ -155,8 +184,7 @@ if page == 'Datos Financieros':
             st.write('Oficinas:')
             st.write('Bonos:')
         if cat == 'Operativos':
-            styled_gto_oper = gto_oper_pivot.style.applymap(apply_color)
-            st.dataframe(styled_gto_oper)
+            st.dataframe(gto_oper_pivot)
             st.subheader('Gastos: Operativos', divider='green')
             st.write('Destajo')
             st.write('Horas Extras')
