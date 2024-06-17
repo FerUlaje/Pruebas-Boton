@@ -24,6 +24,7 @@ meses_español = {
 data_ventas = pd.read_excel('./datasets/Ventas_Vori_Vost_2024.xlsx') # leyendo archivo ventas
 data_ventas['Fecha'] = pd.to_datetime(data_ventas['FECHA'])
 data_ventas['month'] = data_ventas['FECHA'].dt.month
+data_ventas['VENTA'] = data_ventas['VENTA'].astype(int)
 
 # ventas totales por mes
 # print(data_ventas.columns)
@@ -37,8 +38,8 @@ cierre_trato_df = data_ventas[data_ventas['TIPO VENTA'] == 'CIERRE DE TRATO']
 ventas_cierre_trato = cierre_trato_df['VENTA'].sum() # obteniendo total de ventas por cierre de trato
 ventas_cierre_trato_pivot = pd.pivot_table(cierre_trato_df, 
                                            values='VENTA', 
-                                           index='MES', 
-                                           aggfunc="sum")
+                                           index='month', 
+                                           aggfunc="sum",)
 ventas_cierre_trato_pivot['VENTA'] = ventas_cierre_trato_pivot['VENTA'].astype(int)
 
 # ventas diseño entrega a cliente
@@ -46,7 +47,7 @@ entrega_diseño_df = data_ventas[data_ventas['TIPO VENTA'] == 'ENTREGA DISEÑO']
 ventas_entrega_diseño = entrega_diseño_df['VENTA'].sum()
 ventas_entrega_diseño_pivot = pd.pivot_table(entrega_diseño_df,
                                              values='VENTA',
-                                             index='MES',
+                                             index='month',
                                              aggfunc="sum")
 ventas_entrega_diseño_pivot['VENTA'] = ventas_entrega_diseño_pivot['VENTA'].astype(int)
 
@@ -55,7 +56,7 @@ inicio_prod_df = data_ventas[data_ventas['TIPO VENTA'] == 'INICIO PRODUCCIÓN']
 ventas_inicio_prod = inicio_prod_df['VENTA'].sum() # obteniendo total de ventas por inicio producción
 ventas_inicio_prod_pivot = pd.pivot_table(inicio_prod_df,
                                           values='VENTA',
-                                          index='MES',
+                                          index='month',
                                           aggfunc='sum')
 ventas_inicio_prod_pivot['VENTA'] = ventas_inicio_prod_pivot['VENTA'].astype(int)
 
@@ -64,7 +65,7 @@ inicio_instal_df = data_ventas[data_ventas['TIPO VENTA'] == 'INICIO INSTALACIÓN
 ventas_inicio_instal = inicio_instal_df['VENTA'].sum()
 ventas_inicio_instal_pivot = pd.pivot_table(inicio_instal_df,
                                             values='VENTA',
-                                            index='MES',
+                                            index='month',
                                             aggfunc='sum')
 ventas_inicio_instal_pivot['VENTA'] = ventas_inicio_instal_pivot['VENTA'].astype(int)
 
@@ -73,7 +74,7 @@ finalizacion_df = data_ventas[data_ventas['TIPO VENTA'] == 'FINALIZACIÓN']
 ventas_finalizacion = finalizacion_df['VENTA'].sum()
 ventas_finalizacion_pivot = pd.pivot_table(finalizacion_df,
                                            values='VENTA',
-                                           index='MES',
+                                           index='month',
                                            aggfunc='sum')
 ventas_finalizacion_pivot['VENTA'] = ventas_finalizacion_pivot['VENTA'].astype(int)
 
@@ -154,43 +155,78 @@ if page == 'Datos Financieros':
                       y = 'VENTA',
                       title='Total Ventas 2024', 
                       text='VENTA',
-                      labels={ 'VENTA': 'venta',
+                      labels={ 'VENTA': 'ventas',
                               'month': 'mes'},)
         fig6.update_layout(yaxis=dict(showgrid=False))
         fig6.update_traces(textposition='outside')
         st.plotly_chart(fig6)
-        
+        ventas_total_por_mes
 
         st.write('Ventas por **Cierre de Trato**: ', ventas_cierre_trato.astype(int))
-        fig = px.line(ventas_cierre_trato_pivot, y='VENTA', title='Ventas Cierre Trato', markers=True, line_shape='spline', text='VENTA')
+        fig = px.line(ventas_cierre_trato_pivot, 
+                      y='VENTA', 
+                      title='Ventas Cierre Trato', 
+                      markers=True, 
+                      line_shape='spline', 
+                      text='VENTA',
+                      labels={'month': 'mes',
+                              'VENTA': 'ventas'})
         fig.update_layout(yaxis=dict(showgrid=False))
         fig.update_traces(textposition='top center')
         st.plotly_chart(fig)
         ventas_cierre_trato_pivot
 
         st.write('Ventas por **Entrega de Diseño**:', ventas_entrega_diseño.astype(int))
-        fig2 = px.line(ventas_entrega_diseño_pivot, y='VENTA', title='Ventas Entrega Diseño', markers=True, line_shape='spline', text='VENTA')
+        fig2 = px.line(ventas_entrega_diseño_pivot, 
+                       y='VENTA', 
+                       title='Ventas Entrega Diseño', 
+                       markers=True, 
+                       line_shape='spline', 
+                       text='VENTA',
+                       labels={'month': 'meses',
+                               'VENTA': 'ventas'})
         fig2.update_layout(yaxis=dict(showgrid=False))
         fig2.update_traces(textposition='top center')
         st.plotly_chart(fig2)
         ventas_entrega_diseño_pivot
 
         st.write('Ventas por **Inicio de Producción**:', ventas_inicio_prod.astype(int))
-        fig3 = px.line(ventas_inicio_prod_pivot, y='VENTA', title='Ventas Inicio Producción', markers=True, line_shape='spline', text='VENTA')
+        fig3 = px.line(ventas_inicio_prod_pivot, 
+                       y='VENTA', 
+                       title='Ventas Inicio Producción', 
+                       markers=True, 
+                       line_shape='spline', 
+                       text='VENTA',
+                       labels={'month': 'meses',
+                               'VENTA': 'ventas'})
         fig3.update_layout(yaxis=dict(showgrid=False))
         fig3.update_traces(textposition='top center')
         st.plotly_chart(fig3)
         ventas_inicio_prod_pivot
 
         st.write('Ventas por **Inicio de Instalación**:', ventas_inicio_instal.astype(int))
-        fig4 = px.line(ventas_inicio_instal_pivot, y='VENTA', title='Ventas Inicio Instalación', markers=True, line_shape='spline', text='VENTA')
+        fig4 = px.line(ventas_inicio_instal_pivot, 
+                       y='VENTA', 
+                       title='Ventas Inicio Instalación', 
+                       markers=True, 
+                       line_shape='spline', 
+                       text='VENTA',
+                       labels={'month': 'meses',
+                               'VENTA': 'ventas'})
         fig4.update_layout(yaxis=dict(showgrid=False))
         fig4.update_traces(textposition='top center')
         st.plotly_chart(fig4)
         ventas_inicio_instal_pivot
 
         st.write('Ventas por **Finalización**:', ventas_finalizacion.astype(int))
-        fig5 = px.line(ventas_finalizacion_pivot, y='VENTA', title='Ventas Finalización', markers=True, line_shape='spline', text='VENTA')
+        fig5 = px.line(ventas_finalizacion_pivot, 
+                       y='VENTA', 
+                       title='Ventas Finalización', 
+                       markers=True, 
+                       line_shape='spline', 
+                       text='VENTA',
+                       labels={'month': 'meses',
+                               'VENTA': 'ventas'})
         fig5.update_layout(yaxis=dict(showgrid=False))
         fig5.update_traces(textposition='top center')
         st.plotly_chart(fig5)
