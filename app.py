@@ -2,6 +2,11 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 import matplotlib
+from calendar import month_name
+
+month_lookup = list(month_name)
+
+
 
 st.title("Comercializadora Integral :red[Vori Vost], S.A. de C.V.")
 st.header('Reporte de Resultados', divider='red')
@@ -17,6 +22,8 @@ meses_español = {
 
 ## Ventas
 data_ventas = pd.read_excel('./datasets/Ventas_Vori_Vost_2024.xlsx') # leyendo archivo ventas
+data_ventas['Fecha'] = pd.to_datetime(data_ventas['FECHA'])
+data_ventas['month'] = data_ventas['FECHA'].dt.month
 # ventas cierre de trato
 cierre_trato_df = data_ventas[data_ventas['TIPO VENTA'] == 'CIERRE DE TRATO']
 ventas_cierre_trato = cierre_trato_df['VENTA'].sum() # obteniendo total de ventas por cierre de trato
@@ -175,7 +182,7 @@ if page == 'Datos Financieros':
             # aplicar formato condicional por filas
             styled_pivot_admon = gto_admon_pivot.style.background_gradient(cmap='viridis',
                                                                            low=.5,
-                                                                           high=0).format("{:,.of}").set_table_styles(magnify())
+                                                                           high=0).format("{:,.0f}").set_table_styles(magnify())
             st.dataframe(styled_pivot_admon)
             st.subheader('Gastos: Administrativos', divider='rainbow')
             st.write('Comisiones MP:')
