@@ -124,7 +124,6 @@ gto_admon_pivot = pd.pivot_table(data_egresos,
 
 ## horas extras
 horas_extras = pd.read_excel('./datasets/horas_extras_2024.xlsx')
-horas_extras
 
 ## Función para aplicar formato condicional
 def apply_color(val):
@@ -154,8 +153,7 @@ if page == 'Datos Financieros':
         fig6 = px.bar(ventas_total_por_mes, 
                       y = 'VENTA',
                       title='Total Ventas 2024', 
-                      text='VENTA', 
-                      color_continuous_scale='viridis',
+                      text='VENTA',
                       labels={ 'VENTA': 'venta',
                               'month': 'mes'},)
         fig6.update_layout(yaxis=dict(showgrid=False))
@@ -216,12 +214,16 @@ if page == 'Datos Financieros':
             st.write('Horas Extras')
             horas_extras_pivot = pd.pivot_table(horas_extras,
                                                 values='costo',
-                                                index='mes',
+                                                index='semana',
                                                 aggfunc='sum')
             fig7 = px.line(horas_extras_pivot,
-                           y='costo')
+                           y='costo',
+                           markers=True, 
+                           line_shape='spline')
+            fig7.update_layout(yaxis=dict(showgrid=False))
+            fig7.update_traces(textposition='top center')
             st.plotly_chart(fig7)
-            horas_extras
+            horas_extras_pivot
             st.write('Gasolina')
             st.write('Servicios Autos')
             st.write('Costos de Retrabajos')
