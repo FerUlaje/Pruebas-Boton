@@ -24,6 +24,14 @@ meses_español = {
 data_ventas = pd.read_excel('./datasets/Ventas_Vori_Vost_2024.xlsx') # leyendo archivo ventas
 data_ventas['Fecha'] = pd.to_datetime(data_ventas['FECHA'])
 data_ventas['month'] = data_ventas['FECHA'].dt.month
+
+# ventas totales por mes
+# print(data_ventas.columns)
+ventas_total_por_mes = pd.pivot_table(data_ventas,
+                                      values='VENTA',
+                                      index='month',
+                                      aggfunc='sum')
+
 # ventas cierre de trato
 cierre_trato_df = data_ventas[data_ventas['TIPO VENTA'] == 'CIERRE DE TRATO']
 ventas_cierre_trato = cierre_trato_df['VENTA'].sum() # obteniendo total de ventas por cierre de trato
@@ -114,6 +122,10 @@ gto_admon_pivot = pd.pivot_table(data_egresos,
                                  aggfunc='sum')
 
 
+## horas extras
+horas_extras = pd.read_excel('./datasets/horas_extras_2024.xlsx')
+horas_extras
+
 ## Función para aplicar formato condicional
 def apply_color(val):
     color = 'background-color: {}'.format('#ff9999') if val < 200 else ('background-color: {}'.format('#99ff99') if val > 400 else 'background-color: {}'.format('#ffff99'))
@@ -139,7 +151,17 @@ if page == 'Datos Financieros':
     financial_option = st.radio('Menu' ,financieros, label_visibility='collapsed', index=None)
     if financial_option == 'Ventas':
         st.subheader('Ventas', divider='blue')
-
+        fig6 = px.bar(ventas_total_por_mes, 
+                      y = 'VENTA',
+                      title='Total Ventas 2024', 
+                      text='VENTA', 
+                      color_continuous_scale='viridis',
+                      labels={ 'VENTA': 'venta',
+                              'month': 'mes'},)
+        fig6.update_layout(yaxis=dict(showgrid=False))
+        fig6.update_traces(textposition='outside')
+        st.plotly_chart(fig6)
+        
 
         st.write('Ventas por **Cierre de Trato**: ', ventas_cierre_trato.astype(int))
         fig = px.line(ventas_cierre_trato_pivot, y='VENTA', title='Ventas Cierre Trato', markers=True, line_shape='spline', text='VENTA')
@@ -180,10 +202,7 @@ if page == 'Datos Financieros':
         cat = st.radio('Gastos:', cat_gastos, index=None)
         if cat == 'Administrativos':
             # aplicar formato condicional por filas
-            styled_pivot_admon = gto_admon_pivot.style.background_gradient(cmap='viridis',
-                                                                           low=.5,
-                                                                           high=0).format("{:,.0f}").set_table_styles(magnify())
-            st.dataframe(styled_pivot_admon)
+            st.dataframe(gto_admon_pivot)
             st.subheader('Gastos: Administrativos', divider='rainbow')
             st.write('Comisiones MP:')
             st.write('IMSS/INFONAVIT:')
@@ -195,6 +214,14 @@ if page == 'Datos Financieros':
             st.subheader('Gastos: Operativos', divider='green')
             st.write('Destajo')
             st.write('Horas Extras')
+            horas_extras_pivot = pd.pivot_table(horas_extras,
+                                                values='costo',
+                                                index='mes',
+                                                aggfunc='sum')
+            fig7 = px.line(horas_extras_pivot,
+                           y='costo')
+            st.plotly_chart(fig7)
+            horas_extras
             st.write('Gasolina')
             st.write('Servicios Autos')
             st.write('Costos de Retrabajos')
