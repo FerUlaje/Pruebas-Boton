@@ -24,7 +24,8 @@ meses_español = {
 data_ventas = pd.read_excel('./datasets/Ventas_Vori_Vost_2024.xlsx') # leyendo archivo ventas
 data_ventas['Fecha'] = pd.to_datetime(data_ventas['FECHA'])
 data_ventas['month'] = data_ventas['FECHA'].dt.month
-data_ventas['VENTA'] = data_ventas['VENTA'].astype(int)
+# data_ventas['VENTA'] = data_ventas['VENTA'].astype(int)
+# data_ventas.options.display.float_format = {}
 
 # ventas totales por mes
 # print(data_ventas.columns)
@@ -236,8 +237,8 @@ if page == 'Datos Financieros':
         cat = st.radio('Gastos:', cat_gastos, index=None)
         if cat == 'Administrativos':
             # aplicar formato condicional por filas
-            st.dataframe(gto_admon_pivot)
             st.subheader('Gastos: Administrativos', divider='rainbow')
+            st.dataframe(gto_admon_pivot)
             st.write('Comisiones MP:')
             st.write('IMSS/INFONAVIT:')
             st.write('Finiquitos/Primas:')
