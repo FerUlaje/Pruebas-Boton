@@ -421,15 +421,38 @@ if page == 'Datos Financieros':
             st.dataframe(gto_oper_pivot, column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'))
             st.subheader('Gastos: Operativos', divider='green')
             st.write('Destajo')
+            costo_destajo = pd.pivot_table(destajo_2024,
+                                           values='TOTAL DESTAJO',
+                                           index='SEMANA',
+                                           aggfunc='sum')
+            costo_destajo['TOTAL DESTAJO'] = costo_destajo['TOTAL DESTAJO'].astype(int)
+            fig19 = px.line(costo_destajo,
+                            y='TOTAL DESTAJO',
+                            markers=True,
+                            line_shape='spline',
+                            text='TOTAL DESTAJO')
+            fig19.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Costo Destajo",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+            fig19.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            st.plotly_chart(fig19)
+            st.dataframe(costo_destajo)
             st.write('Horas Extras')
             horas_extras_pivot = pd.pivot_table(horas_extras,
                                                 values='costo',
                                                 index='semana',
                                                 aggfunc='sum')
+            horas_extras_pivot['costo'] = horas_extras_pivot['costo'].astype(int)
             fig7 = px.line(horas_extras_pivot,
                            y='costo',
                            markers=True, 
-                           line_shape='spline')
+                           line_shape='spline',
+                           text='costo')
             fig7.update_layout(yaxis=dict(showgrid=False),
                                 title={
                                     'text': "Costo Horas Extras",
