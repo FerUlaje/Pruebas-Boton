@@ -165,6 +165,12 @@ servicio_autos['month'] = servicio_autos['Fecha'].dt.month
 ## horas extras
 horas_extras = pd.read_excel('./datasets/horas_extras_2024.xlsx')
 
+## Destajo
+destajo = pd.read_excel('./datasets/destajo.xlsx')
+destajo['FECHA'] = pd.to_datetime(destajo['FECHA'])
+destajo_2024 = destajo[destajo['FECHA'].dt.year == 2024]
+destajo_2024['month'] = destajo['FECHA'].dt.month
+
 ## Función para aplicar formato condicional
 def apply_color(val):
     color = 'background-color: {}'.format('#ff9999') if val < 200 else ('background-color: {}'.format('#99ff99') if val > 400 else 'background-color: {}'.format('#ffff99'))
@@ -562,6 +568,28 @@ if page == 'Datos Operativos':
                                     margins=all,
                                     margins_name='Total')
         st.dataframe(prod_pivot_1)
-        st.write()
     if operation_option == 'Instalación':
         st.subheader('Datos de Instalación', divider='rainbow')
+        destajo_pivot = pd.pivot_table(destajo_2024,
+                                       index='SEMANA',
+                                       values=['ML', 'PZAS', 'DIA'],
+                                       aggfunc='sum')
+        fig18 = px.bar(destajo_pivot,
+                       y=['ML', 'PZAS', 'DIA'])
+        fig18.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Total de Trabajo de Instalación",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+        fig18.update_traces(texttemplate='%{value}', textposition='inside')
+        st.plotly_chart(fig18)
+        destajo_pivot_1 = pd.pivot_table(destajo_2024,
+                                       index='SEMANA',
+                                       values=['ML', 'PZAS', 'DIA'],
+                                       aggfunc='sum',
+                                       margins=all,
+                                       margins_name='Total')
+        st.dataframe(destajo_pivot_1)
