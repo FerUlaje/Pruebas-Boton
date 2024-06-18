@@ -485,6 +485,7 @@ if page == 'Datos Financieros':
             st.write('No se puede obtener el costo de retrabajos')
     if financial_option == 'Estado de Resultados':
         st.subheader('Estado de Resultados', divider='red')
+        st.image('./edo_resultados/edo_resultados_acum_mayo.png', caption='Estado de Resultados Mayo 2024')
 if page == 'Datos Operativos':
     st.subheader(page)
     operativas = ['Diseño', 'Producción', 'Instalación']
