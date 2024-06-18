@@ -89,16 +89,18 @@ data_diseño_entrega_cliente = data_diseño.loc[filtro_entrega_cliente]
 data_diseño_entrega_cliente['Fecha'] = pd.to_datetime(data_diseño_entrega_cliente['Fecha'])
 data_diseño_entrega_cliente_24 = data_diseño_entrega_cliente[data_diseño_entrega_cliente['Fecha'].dt.year == 2024]
 # data_diseño_entrega_cliente_24 = data_diseño_entrega_cliente_24.sort_values(by='Fecha')
-data_diseño_entrega_cliente_24['month'] = data_diseño_entrega_cliente_24['Fecha'].dt.month.map(meses_español)
+data_diseño_entrega_cliente_24['month'] = data_diseño_entrega_cliente_24['Fecha'].dt.month
 diseño_pivot = pd.pivot_table(data_diseño_entrega_cliente_24, values='ML Realizados', index='month', aggfunc="sum")
+diseño_pivot['ML Realizados'] = diseño_pivot['ML Realizados'].astype(int)
 
 # diseño entrega a producción
 filtro_entrega_produccion = data_diseño['Proceso'] == 'Producción'
 data_diseño_entrega_produccion = data_diseño.loc[filtro_entrega_produccion]
 data_diseño_entrega_produccion['Fecha'] = pd.to_datetime(data_diseño_entrega_produccion['Fecha'])
 data_diseño_entrega_produccion_24 = data_diseño_entrega_produccion[data_diseño_entrega_produccion['Fecha'].dt.year == 2024]
-data_diseño_entrega_produccion_24['month'] = data_diseño_entrega_produccion_24['Fecha'].dt.month.map(meses_español)
+data_diseño_entrega_produccion_24['month'] = data_diseño_entrega_produccion_24['Fecha'].dt.month
 diseño_pivot_prod = pd.pivot_table(data_diseño_entrega_produccion_24, values='ML Realizados', index='month', aggfunc='sum')
+diseño_pivot_prod['ML Realizados'] = diseño_pivot_prod['ML Realizados'].astype(int)
 
 
 ## Egresos
@@ -180,6 +182,13 @@ def magnify():
                  props=[('max-width', '200px'),
                         ('font-size', '12pt')])
 ]
+
+## Producción
+data_prod = pd.read_excel('./datasets/produccion.xlsx')
+data_prod['Fecha'] = pd.to_datetime(data_prod['Fecha'])
+data_prod_2024 = data_prod[data_prod['Fecha'].dt.year == 2024]
+data_prod_2024['month'] = data_prod_2024['Fecha'].dt.month
+data_prod_2024_real = data_prod_2024[data_prod_2024['Fecha'].dt.month >= 4]
 
 if page == 'Datos Financieros':
     financieros = ['Ventas', 'Control de gastos', 'Estado de Resultados']
@@ -492,8 +501,67 @@ if page == 'Datos Operativos':
     operation_option = st.radio('Menu', operativas, index=None, label_visibility='collapsed')
     if operation_option == 'Diseño':
         st.subheader('ML Entregados a Clientes', divider='green')
-        diseño_clientes_chart = st.line_chart(diseño_pivot)
+        fig15 = px.line(diseño_pivot,
+                        y='ML Realizados',
+                        markers=True,
+                        line_shape='spline',
+                        text='ML Realizados')
+        fig15.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Metros Lineales Entregados a Clientes",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+        fig15.update_traces(textposition='top center', line=dict(color='#FF0000'))
+        st.plotly_chart(fig15)
         diseño_pivot
         st.subheader('ML Entregados a Producción', divider='rainbow')
-        diseño_prod_chart = st.line_chart(diseño_pivot_prod)
+        fig16 = px.line(diseño_pivot_prod,
+                        y='ML Realizados',
+                        markers=True,
+                        line_shape='spline',
+                        text='ML Realizados')
+        fig16.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Metros Lineales Entregados a Producción",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+        fig16.update_traces(textposition='top center', line=dict(color='#FF0000'))
+        st.plotly_chart(fig16)
         diseño_pivot_prod
+    if operation_option == 'Producción':
+        st.subheader('Total Metros Lineales Producidos', divider='red')
+        prod_pivot = pd.pivot_table(data_prod_2024_real,
+                                    values='PRODUCIDOS',
+                                    index='month',
+                                    columns='Área',
+                                    aggfunc='sum')
+        fig17 = px.bar(prod_pivot,
+                       y=['Entregable', 'Extras', 'Retrabajos'])
+        fig17.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Total de ML Producidos",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+        fig17.update_traces(texttemplate='%{value}', textposition='inside')
+        st.plotly_chart(fig17)
+        # mostrando los totales de la tabla dinámica
+        prod_pivot_1 = pd.pivot_table(data_prod_2024_real,
+                                    values='PRODUCIDOS',
+                                    index='month',
+                                    columns='Área',
+                                    aggfunc='sum',
+                                    margins=all,
+                                    margins_name='Total')
+        st.dataframe(prod_pivot_1)
+        st.write()
+    if operation_option == 'Instalación':
+        st.subheader('Datos de Instalación', divider='rainbow')
