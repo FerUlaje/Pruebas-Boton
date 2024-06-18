@@ -33,6 +33,7 @@ ventas_total_por_mes = pd.pivot_table(data_ventas,
                                       values='VENTA',
                                       index='month',
                                       aggfunc='sum')
+ventas_total_por_mes['VENTA'] = ventas_total_por_mes['VENTA'].astype(int)
 
 # ventas cierre de trato
 cierre_trato_df = data_ventas[data_ventas['TIPO VENTA'] == 'CIERRE DE TRATO']
@@ -117,12 +118,38 @@ gto_oper_pivot = pd.pivot_table(data_egresos_gto_oper,
                                 columns='mes',
                                 aggfunc='sum')
 
-gto_admon_pivot = pd.pivot_table(data_egresos,
+gto_admon_pivot = pd.pivot_table(data_egresos_gto_admin,
                                  values='Monto',
                                  index='Subcategoría',
                                  columns='mes',
                                  aggfunc='sum')
 
+
+## Comisiones MP
+
+filtro_gto_oper_comisiones_mp = data_egresos_gto_admin['Subcategoría'] == 'COMISIONES OTRO MP'
+data_egresos_gto_admin_comisiones_mp = data_egresos_gto_admin.loc[filtro_gto_oper_comisiones_mp]
+data_egresos_gto_admin_comisiones_mp['month'] = data_egresos_gto_admin_comisiones_mp['Fecha'].dt.month
+
+## IMSS/INFONAVIT/FONACOT
+filtro_imss = data_egresos_gto_admin['Subcategoría'] == 'IMSS/INFONAVIT/FONACOT'
+egresos_admin_imss = data_egresos_gto_admin.loc[filtro_imss]
+egresos_admin_imss['month'] = egresos_admin_imss['Fecha'].dt.month
+
+## Finiquito/PrimaVacacional
+filtro_finiquito = data_egresos_gto_admin['Subcategoría'] == 'FINIQUITO/PRIMA VACACIONAL'
+egresos_finiquitos = data_egresos_gto_admin.loc[filtro_finiquito]
+egresos_finiquitos['month'] = egresos_finiquitos['Fecha'].dt.month
+
+## Oficinas
+filtro_oficinas = data_egresos_gto_admin['Subcategoría'] == 'OFICINAS'
+egresos_oficinas = data_egresos_gto_admin.loc[filtro_oficinas]
+egresos_oficinas['month'] = egresos_oficinas['Fecha'].dt.month
+
+## Bonos
+filtro_bonos_admin = data_egresos_gto_admin['Subcategoría'] == 'BONOS'
+bonos_admin = data_egresos_gto_admin.loc[filtro_bonos_admin]
+bonos_admin['month'] = bonos_admin['Fecha'].dt.month
 
 ## horas extras
 horas_extras = pd.read_excel('./datasets/horas_extras_2024.xlsx')
@@ -144,7 +171,6 @@ def magnify():
                  props=[('max-width', '200px'),
                         ('font-size', '12pt')])
 ]
-
 
 if page == 'Datos Financieros':
     financieros = ['Ventas', 'Control de gastos', 'Estado de Resultados']
@@ -238,12 +264,135 @@ if page == 'Datos Financieros':
         if cat == 'Administrativos':
             # aplicar formato condicional por filas
             st.subheader('Gastos: Administrativos', divider='rainbow')
-            st.dataframe(gto_admon_pivot)
+            st.dataframe(gto_admon_pivot, column_order=('Enero', 'Febrero', 'Marzo', 'Abril'))
             st.write('Comisiones MP:')
+            comisiones_admin_mp = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
+                                                 values='Monto',
+                                                 index='month',
+                                                 aggfunc='sum')
+            fig8 = px.line(comisiones_admin_mp,
+                           y='Monto',
+                           title='Comisiones Otro MP',
+                           markers=True,
+                           line_shape='spline',
+                           text='Monto')
+            fig8.update_layout(yaxis=dict(showgrid=False))
+            fig8.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            st.plotly_chart(fig8)
+            # mostrar tabla dinámica con totales
+            comisiones_admin_mp_1 = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
+                                                 values='Monto',
+                                                 index='month',
+                                                 aggfunc='sum',
+                                                 margins=True,
+                                                 margins_name='Total')
+            comisiones_admin_mp_1
             st.write('IMSS/INFONAVIT:')
+            imss_pivot = pd.pivot_table(egresos_admin_imss,
+                                        values='Monto',
+                                        index='month',
+                                        aggfunc='sum')
+            fig9 = px.line(imss_pivot,
+                           y='Monto',
+                           title='IMSS, INFONAVIT y FONACOT',
+                           markers=True,
+                           line_shape='spline',
+                           text='Monto')
+            fig9.update_layout(yaxis=dict(showgrid=False))
+            fig9.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            st.plotly_chart(fig9)
+            # mostrar tabla dinámica con totales
+            imss_pivot_1 = pd.pivot_table(egresos_admin_imss,
+                                        values='Monto',
+                                        index='month',
+                                        aggfunc='sum',
+                                        margins=True,
+                                        margins_name='Total')
+            imss_pivot_1
             st.write('Finiquitos/Primas:')
+            finiquitos_pivot = pd.pivot_table(egresos_finiquitos,
+                                              values='Monto',
+                                              index='month',
+                                              aggfunc='sum')
+            fig10 = px.line(finiquitos_pivot,
+                            y='Monto',
+                           markers=True,
+                           line_shape='spline',
+                           text='Monto')
+            fig10.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Finiquitos y Primas Vacacionales",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+            fig10.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            st.plotly_chart(fig10)
+            # mostrar tabla dinámica con totales
+            finiquitos_pivot_1 = pd.pivot_table(egresos_finiquitos,
+                                              values='Monto',
+                                              index='month',
+                                              aggfunc='sum',
+                                              margins=True,
+                                              margins_name='Total')
+            finiquitos_pivot_1
             st.write('Oficinas:')
+            oficinas_pivot = pd.pivot_table(egresos_oficinas,
+                                            values='Monto',
+                                            index='month',
+                                            aggfunc='sum')
+            fig11 = px.line(oficinas_pivot,
+                            y='Monto',
+                            markers=True,
+                            line_shape='spline',
+                            text='Monto')
+            fig11.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Gastos Oficinas",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+            fig11.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            st.plotly_chart(fig11)
+            # mostrando tabla dinámica con totales totales
+            oficinas_pivot_1 = pd.pivot_table(egresos_oficinas,
+                                            values='Monto',
+                                            index='month',
+                                            aggfunc='sum',
+                                            margins=True,
+                                            margins_name='Total')
+            oficinas_pivot_1
             st.write('Bonos:')
+            bonos_admin_pivot = pd.pivot_table(bonos_admin,
+                                               values='Monto',
+                                               index='month',
+                                               aggfunc='sum')
+            fig12 = px.line(bonos_admin_pivot,
+                            y='Monto',
+                            markers=True,
+                            line_shape='spline',
+                            text='Monto')
+            fig12.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Bonos Administrativos",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+            fig12.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            st.plotly_chart(fig12)
+            # mostrando tabla dinámica con totales
+            bonos_admin_pivot_1 = pd.pivot_table(bonos_admin,
+                                               values='Monto',
+                                               index='month',
+                                               aggfunc='sum',
+                                               margins=True,
+                                               margins_name='Total')
+            st.dataframe(bonos_admin_pivot_1)
         if cat == 'Operativos':
             st.dataframe(gto_oper_pivot)
             st.subheader('Gastos: Operativos', divider='green')
