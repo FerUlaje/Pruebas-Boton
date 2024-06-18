@@ -151,6 +151,15 @@ filtro_bonos_admin = data_egresos_gto_admin['Subcategoría'] == 'BONOS'
 bonos_admin = data_egresos_gto_admin.loc[filtro_bonos_admin]
 bonos_admin['month'] = bonos_admin['Fecha'].dt.month
 
+## Gasolina
+filtro_gasolina = data_egresos_gto_oper['Subcategoría'] == 'GASOLINA'
+gasolina = data_egresos_gto_oper.loc[filtro_gasolina]
+gasolina['month'] = gasolina['Fecha'].dt.month
+
+## Servicio autos
+filtro_servicio_autos = data_egresos_gto_oper['Subcategoría'] == 'SERVICIOS AUTOS'
+servicio_autos = data_egresos_gto_oper.loc[filtro_servicio_autos]
+servicio_autos['month'] = servicio_autos['Fecha'].dt.month
 ## horas extras
 horas_extras = pd.read_excel('./datasets/horas_extras_2024.xlsx')
 
@@ -264,7 +273,7 @@ if page == 'Datos Financieros':
         if cat == 'Administrativos':
             # aplicar formato condicional por filas
             st.subheader('Gastos: Administrativos', divider='rainbow')
-            st.dataframe(gto_admon_pivot, column_order=('Enero', 'Febrero', 'Marzo', 'Abril'))
+            st.dataframe(gto_admon_pivot, column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'))
             st.write('Comisiones MP:')
             comisiones_admin_mp = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
                                                  values='Monto',
@@ -394,7 +403,7 @@ if page == 'Datos Financieros':
                                                margins_name='Total')
             st.dataframe(bonos_admin_pivot_1)
         if cat == 'Operativos':
-            st.dataframe(gto_oper_pivot)
+            st.dataframe(gto_oper_pivot, column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'))
             st.subheader('Gastos: Operativos', divider='green')
             st.write('Destajo')
             st.write('Horas Extras')
@@ -406,13 +415,74 @@ if page == 'Datos Financieros':
                            y='costo',
                            markers=True, 
                            line_shape='spline')
-            fig7.update_layout(yaxis=dict(showgrid=False))
-            fig7.update_traces(textposition='top center')
+            fig7.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Costo Horas Extras",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+            fig7.update_traces(textposition='top center', line=dict(color='#FF0000'))
             st.plotly_chart(fig7)
             horas_extras_pivot
             st.write('Gasolina')
+            gasolina_pivot = pd.pivot_table(gasolina,
+                                            values='Monto',
+                                            index='month',
+                                            aggfunc='sum')
+            fig13 = px.line(gasolina_pivot,
+                            y='Monto',
+                            markers=True,
+                            line_shape='spline',
+                            text='Monto')
+            fig13.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Gasolina",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+            fig13.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            st.plotly_chart(fig13)
+            gasolina_pivot_1 = pd.pivot_table(gasolina,
+                                              index='month',
+                                              values='Monto',
+                                              aggfunc='sum',
+                                              margins=True,
+                                              margins_name='Total')
+            st.dataframe(gasolina_pivot_1)
             st.write('Servicios Autos')
-            st.write('Costos de Retrabajos')
+            servicio_autos_pivot = pd.pivot_table(servicio_autos,
+                                                  index='month',
+                                                  values='Monto',
+                                                  aggfunc='sum')
+            fig14 = px.line(servicio_autos_pivot,
+                            y='Monto',
+                            markers=True,
+                            line_shape='spline',
+                            text='Monto')
+            fig14.update_layout(yaxis=dict(showgrid=False),
+                                title={
+                                    'text': "Servicios de Autos",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                })
+            fig14.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            st.plotly_chart(fig14)
+            # mostrando tabla dinámica con totales
+            servicio_autos_pivot_1 = pd.pivot_table(servicio_autos,
+                                              index='month',
+                                              values='Monto',
+                                              aggfunc='sum',
+                                              margins=True,
+                                              margins_name='Total')
+            st.dataframe(servicio_autos_pivot_1)
+            st.subheader('Costos de Retrabajos')
+            st.write('No se puede obtener el costo de retrabajos')
     if financial_option == 'Estado de Resultados':
         st.subheader('Estado de Resultados', divider='red')
 if page == 'Datos Operativos':
