@@ -27,13 +27,22 @@ data_ventas['month'] = data_ventas['FECHA'].dt.month
 # data_ventas['VENTA'] = data_ventas['VENTA'].astype(int)
 # data_ventas.options.display.float_format = {}
 
+## Aplicar formato de moneda
+# data_ventas['VENTA'] = data_ventas['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
+# data_ventas
 # ventas totales por mes
 # print(data_ventas.columns)
 ventas_total_por_mes = pd.pivot_table(data_ventas,
                                       values='VENTA',
                                       index='month',
                                       aggfunc='sum')
-ventas_total_por_mes['VENTA'] = ventas_total_por_mes['VENTA'].astype(int)
+
+ventas_total_por_mes_con_total = pd.pivot_table(data_ventas,
+                                      values='VENTA',
+                                      index='month',
+                                      aggfunc='sum',
+                                      margins=True,
+                                      margins_name='Total')
 
 # ventas cierre de trato
 cierre_trato_df = data_ventas[data_ventas['TIPO VENTA'] == 'CIERRE DE TRATO']
@@ -42,7 +51,7 @@ ventas_cierre_trato_pivot = pd.pivot_table(cierre_trato_df,
                                            values='VENTA', 
                                            index='month', 
                                            aggfunc="sum",)
-ventas_cierre_trato_pivot['VENTA'] = ventas_cierre_trato_pivot['VENTA'].astype(int)
+
 
 # ventas diseño entrega a cliente
 entrega_diseño_df = data_ventas[data_ventas['TIPO VENTA'] == 'ENTREGA DISEÑO']
@@ -51,7 +60,7 @@ ventas_entrega_diseño_pivot = pd.pivot_table(entrega_diseño_df,
                                              values='VENTA',
                                              index='month',
                                              aggfunc="sum")
-ventas_entrega_diseño_pivot['VENTA'] = ventas_entrega_diseño_pivot['VENTA'].astype(int)
+
 
 # ventas inicio producción
 inicio_prod_df = data_ventas[data_ventas['TIPO VENTA'] == 'INICIO PRODUCCIÓN']
@@ -60,7 +69,7 @@ ventas_inicio_prod_pivot = pd.pivot_table(inicio_prod_df,
                                           values='VENTA',
                                           index='month',
                                           aggfunc='sum')
-ventas_inicio_prod_pivot['VENTA'] = ventas_inicio_prod_pivot['VENTA'].astype(int)
+
 
 # ventas inicio instalación
 inicio_instal_df = data_ventas[data_ventas['TIPO VENTA'] == 'INICIO INSTALACIÓN']
@@ -69,7 +78,7 @@ ventas_inicio_instal_pivot = pd.pivot_table(inicio_instal_df,
                                             values='VENTA',
                                             index='month',
                                             aggfunc='sum')
-ventas_inicio_instal_pivot['VENTA'] = ventas_inicio_instal_pivot['VENTA'].astype(int)
+
 
 # ventas finalización
 finalizacion_df = data_ventas[data_ventas['TIPO VENTA'] == 'FINALIZACIÓN']
@@ -78,7 +87,7 @@ ventas_finalizacion_pivot = pd.pivot_table(finalizacion_df,
                                            values='VENTA',
                                            index='month',
                                            aggfunc='sum')
-ventas_finalizacion_pivot['VENTA'] = ventas_finalizacion_pivot['VENTA'].astype(int)
+
 
 
 ## datos de diseño
@@ -171,24 +180,6 @@ destajo['FECHA'] = pd.to_datetime(destajo['FECHA'])
 destajo_2024 = destajo[destajo['FECHA'].dt.year == 2024]
 destajo_2024['month'] = destajo['FECHA'].dt.month
 
-## Función para aplicar formato condicional
-def apply_color(val):
-    color = 'background-color: {}'.format('#ff9999') if val < 200 else ('background-color: {}'.format('#99ff99') if val > 400 else 'background-color: {}'.format('#ffff99'))
-    return color
-
-# aplicar el formato condicional por filas
-def magnify():
-    return [dict(selector="th",
-                 props=[("font-size", "4pt")]),
-            dict(selector="td",
-                 props=[('padding', "0em 0em")]),
-            dict(selector="th:hover",
-                 props=[("font-size", "12pt")]),
-            dict(selector="tr:hover td:hover",
-                 props=[('max-width', '200px'),
-                        ('font-size', '12pt')])
-]
-
 ## Producción
 data_prod = pd.read_excel('./datasets/produccion.xlsx')
 data_prod['Fecha'] = pd.to_datetime(data_prod['Fecha'])
@@ -209,10 +200,12 @@ if page == 'Datos Financieros':
                       labels={ 'VENTA': 'ventas',
                               'month': 'mes'},)
         fig6.update_layout(yaxis=dict(showgrid=False))
-        fig6.update_traces(textposition='outside')
+        fig6.update_traces(textposition='outside',
+                           texttemplate='$%{text:,.0f}')
         st.plotly_chart(fig6)
-        ventas_total_por_mes
-
+        ventas_total_por_mes_con_total['VENTA'] = ventas_total_por_mes_con_total['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
+        ventas_total_por_mes_con_total
+        
         st.write('Ventas por **Cierre de Trato**: ', ventas_cierre_trato.astype(int))
         fig = px.line(ventas_cierre_trato_pivot, 
                       y='VENTA', 
@@ -223,8 +216,10 @@ if page == 'Datos Financieros':
                       labels={'month': 'mes',
                               'VENTA': 'ventas'})
         fig.update_layout(yaxis=dict(showgrid=False))
-        fig.update_traces(textposition='top center')
+        fig.update_traces(textposition='top center',
+                          texttemplate='$%{text:,.0f}')
         st.plotly_chart(fig)
+        ventas_cierre_trato_pivot['VENTA'] =ventas_cierre_trato_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_cierre_trato_pivot
 
         st.write('Ventas por **Entrega de Diseño**:', ventas_entrega_diseño.astype(int))
@@ -237,8 +232,10 @@ if page == 'Datos Financieros':
                        labels={'month': 'meses',
                                'VENTA': 'ventas'})
         fig2.update_layout(yaxis=dict(showgrid=False))
-        fig2.update_traces(textposition='top center')
+        fig2.update_traces(textposition='top center',
+                           texttemplate='$%{text:,.0f}')
         st.plotly_chart(fig2)
+        ventas_entrega_diseño_pivot['VENTA'] = ventas_entrega_diseño_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_entrega_diseño_pivot
 
         st.write('Ventas por **Inicio de Producción**:', ventas_inicio_prod.astype(int))
@@ -251,8 +248,10 @@ if page == 'Datos Financieros':
                        labels={'month': 'meses',
                                'VENTA': 'ventas'})
         fig3.update_layout(yaxis=dict(showgrid=False))
-        fig3.update_traces(textposition='top center')
+        fig3.update_traces(textposition='top center',
+                           texttemplate='$%{text:,.0f}')
         st.plotly_chart(fig3)
+        ventas_inicio_prod_pivot['VENTA'] = ventas_inicio_prod_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_inicio_prod_pivot
 
         st.write('Ventas por **Inicio de Instalación**:', ventas_inicio_instal.astype(int))
@@ -265,8 +264,10 @@ if page == 'Datos Financieros':
                        labels={'month': 'meses',
                                'VENTA': 'ventas'})
         fig4.update_layout(yaxis=dict(showgrid=False))
-        fig4.update_traces(textposition='top center')
+        fig4.update_traces(textposition='top center',
+                           texttemplate='$%{text:,.0f}')
         st.plotly_chart(fig4)
+        ventas_inicio_instal_pivot['VENTA'] = ventas_inicio_instal_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_inicio_instal_pivot
 
         st.write('Ventas por **Finalización**:', ventas_finalizacion.astype(int))
@@ -279,9 +280,12 @@ if page == 'Datos Financieros':
                        labels={'month': 'meses',
                                'VENTA': 'ventas'})
         fig5.update_layout(yaxis=dict(showgrid=False))
-        fig5.update_traces(textposition='top center')
+        fig5.update_traces(textposition='top center',
+                           texttemplate='$%{text:,.0f}')
         st.plotly_chart(fig5)
+        ventas_finalizacion_pivot['VENTA'] = ventas_finalizacion_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_finalizacion_pivot
+
     if financial_option == 'Control de gastos':
         cat_gastos = ['Administrativos', 'Operativos']
         cat = st.radio('Gastos:', cat_gastos, index=None)
@@ -593,13 +597,16 @@ if page == 'Datos Operativos':
         st.dataframe(prod_pivot_1)
     if operation_option == 'Instalación':
         st.subheader('Datos de Instalación', divider='rainbow')
-        destajo_pivot = pd.pivot_table(destajo_2024,
-                                       index='SEMANA',
-                                       values=['ML', 'PZAS', 'DIA'],
-                                       aggfunc='sum')
-        fig18 = px.bar(destajo_pivot,
-                       y=['ML', 'PZAS', 'DIA'])
-        fig18.update_layout(yaxis=dict(showgrid=False),
+        # Convertir el DataFrame en formato largo
+        destajo_long = pd.melt(destajo_2024,
+                               id_vars=['SEMANA'],
+                               value_vars=['ML', 'PZAS', 'DIA'],
+                               var_name='KPI',
+                               value_name='valor')
+        destajo_long
+        # Gráfico no apilado
+        fig20 = px.bar(destajo_long, y='valor', color='KPI', barmode='group', x='SEMANA')
+        fig20.update_layout(yaxis=dict(showgrid=False),
                                 title={
                                     'text': "Total de Trabajo de Instalación",
                                     'y': 0.9,  # Alineación vertical
@@ -607,8 +614,8 @@ if page == 'Datos Operativos':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-        fig18.update_traces(texttemplate='%{value}', textposition='inside')
-        st.plotly_chart(fig18)
+        fig20.update_traces(texttemplate='valor', textposition='inside')
+        st.plotly_chart(fig20)
         destajo_pivot_1 = pd.pivot_table(destajo_2024,
                                        index='SEMANA',
                                        values=['ML', 'PZAS', 'DIA'],
