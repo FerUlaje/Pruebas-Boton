@@ -292,7 +292,28 @@ if page == 'Datos Financieros':
         if cat == 'Administrativos':
             # aplicar formato condicional por filas
             st.subheader('Gastos: Administrativos', divider='rainbow')
-            st.dataframe(gto_admon_pivot, column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'))
+            # aplicando formato de moneda
+            st.data_editor(gto_admon_pivot,
+                           column_config={
+                               "Enero": st.column_config.NumberColumn(
+                                   format="$ %.0f",
+                               ),
+                               "Febrero": st.column_config.NumberColumn(
+                                    format="$ %.0f",
+                               ),
+                               "Marzo": st.column_config.NumberColumn(
+                                    format="$ %.0f",
+                               ),
+                               "Abril": st.column_config.NumberColumn(
+                                    format="$ %.0f",
+                               ),
+                               "Mayo": st.column_config.NumberColumn(
+                                    format="$ %.0f",
+                               ),
+                               "Junio": st.column_config.NumberColumn(
+                                    format="$ %.0f",
+                               ),
+                           }, column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'))
             st.write('Comisiones MP:')
             comisiones_admin_mp = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
                                                  values='Monto',
