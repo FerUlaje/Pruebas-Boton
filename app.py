@@ -192,13 +192,14 @@ if page == 'Datos Financieros':
     st.subheader(page)
     financial_option = st.radio('Menu' ,financieros, label_visibility='collapsed', index=None)
     if financial_option == 'Ventas':
-        st.subheader('Ventas', divider='blue')
+        st.subheader('Ventas', divider='green')
         fig6 = px.bar(ventas_total_por_mes, 
                       y = 'VENTA',
                       title='Total Ventas 2024', 
                       text='VENTA',
                       labels={ 'VENTA': 'ventas',
-                              'month': 'mes'},)
+                              'month': 'mes'},
+                    color_discrete_sequence=['green'])
         fig6.update_layout(yaxis=dict(showgrid=False))
         fig6.update_traces(textposition='outside',
                            texttemplate='$%{text:,.0f}')
@@ -217,7 +218,8 @@ if page == 'Datos Financieros':
                               'VENTA': 'ventas'})
         fig.update_layout(yaxis=dict(showgrid=False))
         fig.update_traces(textposition='top center',
-                          texttemplate='$%{text:,.0f}')
+                          texttemplate='$%{text:,.0f}',
+                          line=dict(color='#00FF00'))
         st.plotly_chart(fig)
         ventas_cierre_trato_pivot['VENTA'] =ventas_cierre_trato_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_cierre_trato_pivot
@@ -233,7 +235,8 @@ if page == 'Datos Financieros':
                                'VENTA': 'ventas'})
         fig2.update_layout(yaxis=dict(showgrid=False))
         fig2.update_traces(textposition='top center',
-                           texttemplate='$%{text:,.0f}')
+                           texttemplate='$%{text:,.0f}',
+                          line=dict(color='#00FF00'))
         st.plotly_chart(fig2)
         ventas_entrega_diseño_pivot['VENTA'] = ventas_entrega_diseño_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_entrega_diseño_pivot
@@ -249,7 +252,8 @@ if page == 'Datos Financieros':
                                'VENTA': 'ventas'})
         fig3.update_layout(yaxis=dict(showgrid=False))
         fig3.update_traces(textposition='top center',
-                           texttemplate='$%{text:,.0f}')
+                           texttemplate='$%{text:,.0f}',
+                          line=dict(color='#00FF00'))
         st.plotly_chart(fig3)
         ventas_inicio_prod_pivot['VENTA'] = ventas_inicio_prod_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_inicio_prod_pivot
@@ -265,7 +269,8 @@ if page == 'Datos Financieros':
                                'VENTA': 'ventas'})
         fig4.update_layout(yaxis=dict(showgrid=False))
         fig4.update_traces(textposition='top center',
-                           texttemplate='$%{text:,.0f}')
+                           texttemplate='$%{text:,.0f}',
+                           line=dict(color='#00FF00'))
         st.plotly_chart(fig4)
         ventas_inicio_instal_pivot['VENTA'] = ventas_inicio_instal_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_inicio_instal_pivot
@@ -281,7 +286,8 @@ if page == 'Datos Financieros':
                                'VENTA': 'ventas'})
         fig5.update_layout(yaxis=dict(showgrid=False))
         fig5.update_traces(textposition='top center',
-                           texttemplate='$%{text:,.0f}')
+                           texttemplate='$%{text:,.0f}',
+                           line=dict(color='#00FF00'))
         st.plotly_chart(fig5)
         ventas_finalizacion_pivot['VENTA'] = ventas_finalizacion_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_finalizacion_pivot
@@ -290,30 +296,39 @@ if page == 'Datos Financieros':
         cat_gastos = ['Administrativos', 'Operativos']
         cat = st.radio('Gastos:', cat_gastos, index=None)
         if cat == 'Administrativos':
-            # aplicar formato condicional por filas
-            st.subheader('Gastos: Administrativos', divider='rainbow')
+            # rellenando los valores None
+            gto_admon_pivot['Enero'] = gto_admon_pivot['Enero'].fillna(0)
+            gto_admon_pivot['Febrero'] = gto_admon_pivot['Febrero'].fillna(0)
+            gto_admon_pivot['Marzo'] = gto_admon_pivot['Marzo'].fillna(0)
+            gto_admon_pivot['Abril'] = gto_admon_pivot['Abril'].fillna(0)
+            gto_admon_pivot['Mayo'] = gto_admon_pivot['Mayo'].fillna(0)
+            # cambio porcentual 1
+            gto_admon_pivot['%1'] = (gto_admon_pivot['Febrero'] / gto_admon_pivot['Enero']) -1
+            gto_admon_pivot['%1'] = gto_admon_pivot['%1'].fillna(0)
+            # cambio porcentual 2
+            gto_admon_pivot['%2'] = (gto_admon_pivot['Marzo'] / gto_admon_pivot['Febrero']) -1
+            gto_admon_pivot['%2'] = gto_admon_pivot['%2'].fillna(0)
+            # cambio porcentual 3
+            gto_admon_pivot['%3'] = (gto_admon_pivot['Abril'] / gto_admon_pivot['Marzo']) -1
+            gto_admon_pivot['%3'] = gto_admon_pivot['%3'].fillna(0)
+            # cambio porcentual 4
+            gto_admon_pivot['%4'] = (gto_admon_pivot['Mayo'] / gto_admon_pivot['Abril']) -1
+            gto_admon_pivot['%4'] = gto_admon_pivot['%4'].fillna(0)
+            # divisor
+            st.subheader('Gastos: Administrativos', divider='red')
             # aplicando formato de moneda
-            st.data_editor(gto_admon_pivot,
-                           column_config={
-                               "Enero": st.column_config.NumberColumn(
-                                   format="$ %.0f",
-                               ),
-                               "Febrero": st.column_config.NumberColumn(
-                                    format="$ %.0f",
-                               ),
-                               "Marzo": st.column_config.NumberColumn(
-                                    format="$ %.0f",
-                               ),
-                               "Abril": st.column_config.NumberColumn(
-                                    format="$ %.0f",
-                               ),
-                               "Mayo": st.column_config.NumberColumn(
-                                    format="$ %.0f",
-                               ),
-                               "Junio": st.column_config.NumberColumn(
-                                    format="$ %.0f",
-                               ),
-                           }, column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'))
+            gto_admon_pivot = gto_admon_pivot[['Enero', 'Febrero', '%1', 'Marzo', '%2', 'Abril', '%3', 'Mayo', '%4']]
+            gto_admon_pivot['Enero'] = gto_admon_pivot['Enero'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_pivot['Febrero'] = gto_admon_pivot['Febrero'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_pivot['%1'] = gto_admon_pivot['%1'].apply(lambda x: f'{x:.0%}')
+            gto_admon_pivot['Marzo'] = gto_admon_pivot['Marzo'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_pivot['%2'] = gto_admon_pivot['%2'].apply(lambda x: f'{x:.0%}')
+            gto_admon_pivot['Abril'] = gto_admon_pivot['Abril'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_pivot['%3'] = gto_admon_pivot['%3'].apply(lambda x: f'{x:.0%}')
+            gto_admon_pivot['Mayo'] = gto_admon_pivot['Mayo'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_pivot['%4'] = gto_admon_pivot['%4'].apply(lambda x: f'{x:.0%}')
+
+            gto_admon_pivot
             st.write('Comisiones MP:')
             comisiones_admin_mp = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
                                                  values='Monto',
@@ -326,7 +341,7 @@ if page == 'Datos Financieros':
                            line_shape='spline',
                            text='Monto')
             fig8.update_layout(yaxis=dict(showgrid=False))
-            fig8.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig8.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig8)
             # mostrar tabla dinámica con totales
             comisiones_admin_mp_1 = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
@@ -335,6 +350,8 @@ if page == 'Datos Financieros':
                                                  aggfunc='sum',
                                                  margins=True,
                                                  margins_name='Total')
+            # aplicando formato de moneda
+            comisiones_admin_mp_1['Monto'] = comisiones_admin_mp_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
             comisiones_admin_mp_1
             st.write('IMSS/INFONAVIT:')
             imss_pivot = pd.pivot_table(egresos_admin_imss,
@@ -348,7 +365,7 @@ if page == 'Datos Financieros':
                            line_shape='spline',
                            text='Monto')
             fig9.update_layout(yaxis=dict(showgrid=False))
-            fig9.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig9.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig9)
             # mostrar tabla dinámica con totales
             imss_pivot_1 = pd.pivot_table(egresos_admin_imss,
@@ -357,6 +374,8 @@ if page == 'Datos Financieros':
                                         aggfunc='sum',
                                         margins=True,
                                         margins_name='Total')
+            # aplicando formato de moneda
+            imss_pivot_1['Monto'] = imss_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
             imss_pivot_1
             st.write('Finiquitos/Primas:')
             finiquitos_pivot = pd.pivot_table(egresos_finiquitos,
@@ -376,7 +395,7 @@ if page == 'Datos Financieros':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-            fig10.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig10.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig10)
             # mostrar tabla dinámica con totales
             finiquitos_pivot_1 = pd.pivot_table(egresos_finiquitos,
@@ -385,6 +404,8 @@ if page == 'Datos Financieros':
                                               aggfunc='sum',
                                               margins=True,
                                               margins_name='Total')
+            # aplicando formato de monda
+            finiquitos_pivot_1['Monto'] = finiquitos_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
             finiquitos_pivot_1
             st.write('Oficinas:')
             oficinas_pivot = pd.pivot_table(egresos_oficinas,
@@ -404,7 +425,7 @@ if page == 'Datos Financieros':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-            fig11.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig11.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig11)
             # mostrando tabla dinámica con totales totales
             oficinas_pivot_1 = pd.pivot_table(egresos_oficinas,
@@ -413,6 +434,8 @@ if page == 'Datos Financieros':
                                             aggfunc='sum',
                                             margins=True,
                                             margins_name='Total')
+            # aplicando formato de moneda
+            oficinas_pivot_1['Monto'] = oficinas_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
             oficinas_pivot_1
             st.write('Bonos:')
             bonos_admin_pivot = pd.pivot_table(bonos_admin,
@@ -432,7 +455,7 @@ if page == 'Datos Financieros':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-            fig12.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig12.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig12)
             # mostrando tabla dinámica con totales
             bonos_admin_pivot_1 = pd.pivot_table(bonos_admin,
@@ -441,7 +464,9 @@ if page == 'Datos Financieros':
                                                aggfunc='sum',
                                                margins=True,
                                                margins_name='Total')
-            st.dataframe(bonos_admin_pivot_1)
+            # aplicando formato moneda
+            bonos_admin_pivot_1['Monto'] = bonos_admin_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
+            bonos_admin_pivot_1
         if cat == 'Operativos':
             st.dataframe(gto_oper_pivot, column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'))
             st.subheader('Gastos: Operativos', divider='green')
