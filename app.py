@@ -468,14 +468,43 @@ if page == 'Datos Financieros':
             bonos_admin_pivot_1['Monto'] = bonos_admin_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
             bonos_admin_pivot_1
         if cat == 'Operativos':
-            st.dataframe(gto_oper_pivot, column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'))
-            st.subheader('Gastos: Operativos', divider='green')
+            gto_oper_pivot['Enero'] = gto_oper_pivot['Enero'].fillna(0)
+            gto_oper_pivot['Febrero'] = gto_oper_pivot['Febrero'].fillna(0)
+            gto_oper_pivot['Marzo'] = gto_oper_pivot['Marzo'].fillna(0)
+            gto_oper_pivot['Abril'] = gto_oper_pivot['Abril'].fillna(0)
+            gto_oper_pivot['Mayo'] = gto_oper_pivot['Mayo'].fillna(0)
+            # cambio porcentual 1
+            gto_oper_pivot['%1'] = (gto_oper_pivot['Febrero'] / gto_oper_pivot['Enero'] -1)
+            gto_oper_pivot['%1'] = gto_oper_pivot['%1'].fillna(0)
+            # cambio porcentual 2
+            gto_oper_pivot['%2'] = (gto_oper_pivot['Marzo'] / gto_oper_pivot['Febrero'] -1)
+            gto_oper_pivot['%2'] = gto_oper_pivot['%2'].fillna(0)
+            # cambio porcentual 3
+            gto_oper_pivot['%3'] = (gto_oper_pivot['Abril'] / gto_oper_pivot['Marzo'] -1)
+            gto_oper_pivot['%3'] = gto_oper_pivot['%3'].fillna(0)
+            # cambio porcentual 4
+            gto_oper_pivot['%4'] = (gto_oper_pivot['Mayo'] / gto_oper_pivot['Abril'] -1)
+            gto_oper_pivot['%4'] = gto_oper_pivot['%4'].fillna(0)
+            # reordenando el DataFrame
+            gto_oper_pivot = gto_oper_pivot[['Enero', 'Febrero', '%1', 'Marzo', '%2', 'Abril', '%3', 'Mayo', '%4']]
+            # aplicando formato de moneda y porcentaje
+            gto_oper_pivot['Enero'] = gto_oper_pivot['Enero'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_oper_pivot['Febrero'] = gto_oper_pivot['Febrero'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_oper_pivot['%1'] = gto_oper_pivot['%1'].apply(lambda x: f'{x:.0%}')
+            gto_oper_pivot['Marzo'] = gto_oper_pivot['Marzo'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_oper_pivot['%2'] = gto_oper_pivot['%2'].apply(lambda x: f'{x:.0%}')
+            gto_oper_pivot['Abril'] = gto_oper_pivot['Abril'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_oper_pivot['%3'] = gto_oper_pivot['%3'].apply(lambda x: f'{x:.0%}')
+            gto_oper_pivot['Mayo'] = gto_oper_pivot['Mayo'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_oper_pivot['%4'] = gto_oper_pivot['%4'].apply(lambda x: f'{x:.0%}')
+            # mostrando el DataFrame
+            gto_oper_pivot
+            st.subheader('Gastos: Operativos', divider='red')
             st.write('Destajo')
             costo_destajo = pd.pivot_table(destajo_2024,
                                            values='TOTAL DESTAJO',
                                            index='SEMANA',
                                            aggfunc='sum')
-            costo_destajo['TOTAL DESTAJO'] = costo_destajo['TOTAL DESTAJO'].astype(int)
             fig19 = px.line(costo_destajo,
                             y='TOTAL DESTAJO',
                             markers=True,
@@ -489,15 +518,22 @@ if page == 'Datos Financieros':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-            fig19.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig19.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig19)
-            st.dataframe(costo_destajo)
+            # pivot con totales
+            costo_destajo_1 = pd.pivot_table(destajo_2024,
+                                           values='TOTAL DESTAJO',
+                                           index='SEMANA',
+                                           aggfunc='sum',
+                                           margins=True,
+                                           margins_name='Total')
+            costo_destajo_1['TOTAL DESTAJO'] = costo_destajo_1['TOTAL DESTAJO'].apply(lambda x: '${:,.0f}'.format(x))
+            costo_destajo_1
             st.write('Horas Extras')
             horas_extras_pivot = pd.pivot_table(horas_extras,
                                                 values='costo',
                                                 index='semana',
                                                 aggfunc='sum')
-            horas_extras_pivot['costo'] = horas_extras_pivot['costo'].astype(int)
             fig7 = px.line(horas_extras_pivot,
                            y='costo',
                            markers=True, 
@@ -511,9 +547,16 @@ if page == 'Datos Financieros':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-            fig7.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig7.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig7)
-            horas_extras_pivot
+            horas_extras_pivot_1 = pd.pivot_table(horas_extras,
+                                                values='costo',
+                                                index='semana',
+                                                aggfunc='sum',
+                                                margins=True,
+                                                margins_name='Total')
+            horas_extras_pivot_1['costo'] = horas_extras_pivot_1['costo'].apply(lambda x: '${:,.0f}'.format(x))
+            horas_extras_pivot_1
             st.write('Gasolina')
             gasolina_pivot = pd.pivot_table(gasolina,
                                             values='Monto',
@@ -532,7 +575,7 @@ if page == 'Datos Financieros':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-            fig13.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig13.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig13)
             gasolina_pivot_1 = pd.pivot_table(gasolina,
                                               index='month',
@@ -540,7 +583,8 @@ if page == 'Datos Financieros':
                                               aggfunc='sum',
                                               margins=True,
                                               margins_name='Total')
-            st.dataframe(gasolina_pivot_1)
+            gasolina_pivot_1['Monto'] = gasolina_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
+            gasolina_pivot_1
             st.write('Servicios Autos')
             servicio_autos_pivot = pd.pivot_table(servicio_autos,
                                                   index='month',
@@ -559,7 +603,7 @@ if page == 'Datos Financieros':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-            fig14.update_traces(textposition='top center', line=dict(color='#FF0000'))
+            fig14.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig14)
             # mostrando tabla dinámica con totales
             servicio_autos_pivot_1 = pd.pivot_table(servicio_autos,
@@ -568,9 +612,8 @@ if page == 'Datos Financieros':
                                               aggfunc='sum',
                                               margins=True,
                                               margins_name='Total')
-            st.dataframe(servicio_autos_pivot_1)
-            st.subheader('Costos de Retrabajos')
-            st.write('No se puede obtener el costo de retrabajos')
+            servicio_autos_pivot_1['Monto'] = servicio_autos_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
+            servicio_autos_pivot_1
     if financial_option == 'Estado de Resultados':
         st.subheader('Estado de Resultados', divider='red')
         st.image('./edo_resultados/edo_resultados_acum.png', caption='Estado de Resultados Acumulado 2024')
