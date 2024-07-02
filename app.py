@@ -686,16 +686,14 @@ if page == 'Datos Operativos':
         st.dataframe(prod_pivot_1)
     if operation_option == 'Instalación':
         st.subheader('Datos de Instalación', divider='rainbow')
-        # Convertir el DataFrame en formato largo
-        destajo_long = pd.melt(destajo_2024,
-                               id_vars=['SEMANA'],
-                               value_vars=['ML', 'PZAS', 'DIA'],
-                               var_name='KPI',
-                               value_name='valor')
-        destajo_long
-        # Gráfico no apilado
-        fig20 = px.bar(destajo_long, y='valor', color='KPI', barmode='group', x='SEMANA')
-        fig20.update_layout(yaxis=dict(showgrid=False),
+        destajo_3 = pd.pivot_table(destajo_2024,
+                                   index='SEMANA',
+                                   values=['ML', 'PZAS', 'DIA'],
+                                   aggfunc='sum')
+        fig21 = px.bar(destajo_3,
+                       y=['ML', 'PZAS', 'DIA'],
+                       barmode='group')
+        fig21.update_layout(yaxis=dict(showgrid=False),
                                 title={
                                     'text': "Total de Trabajo de Instalación",
                                     'y': 0.9,  # Alineación vertical
@@ -703,15 +701,18 @@ if page == 'Datos Operativos':
                                     'xanchor': 'center',
                                     'yanchor': 'top'
                                 })
-        fig20.update_traces(texttemplate='valor', textposition='inside')
-        st.plotly_chart(fig20)
+        fig21.update_traces( textposition='inside')
+        st.plotly_chart(fig21)
         destajo_pivot_1 = pd.pivot_table(destajo_2024,
                                        index='SEMANA',
                                        values=['ML', 'PZAS', 'DIA'],
                                        aggfunc='sum',
                                        margins=all,
                                        margins_name='Total')
-        st.dataframe(destajo_pivot_1)
+        destajo_pivot_1['ML'] = destajo_pivot_1['ML'].apply(lambda x: '{:,.0f}'.format(x))
+        destajo_pivot_1['DIA'] = destajo_pivot_1['DIA'].apply(lambda x: '{:,.0f}'.format(x))
+        destajo_pivot_1['PZAS'] = destajo_pivot_1['PZAS'].apply(lambda x: '{:,.0f}'.format(x))
+        destajo_pivot_1
 
 # import seaborn as sns
 
