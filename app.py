@@ -186,6 +186,7 @@ data_prod['Fecha'] = pd.to_datetime(data_prod['Fecha'])
 data_prod_2024 = data_prod[data_prod['Fecha'].dt.year == 2024]
 data_prod_2024['month'] = data_prod_2024['Fecha'].dt.month
 data_prod_2024_real = data_prod_2024[data_prod_2024['Fecha'].dt.month >= 4]
+data_prod_2024_real['PRODUCIDOS'] = data_prod_2024_real['PRODUCIDOS'].astype(int)
 
 if page == 'Datos Financieros':
     financieros = ['Ventas', 'Control de gastos', 'Estado de Resultados']
