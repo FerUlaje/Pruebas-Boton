@@ -136,6 +136,10 @@ gto_admon_pivot = pd.pivot_table(data_egresos_gto_admin,
                                  aggfunc='sum')
 
 
+## Filtrando Egresos por operativos y adminsitrativos
+filtro_admon_oper = (data_egresos['Categoría'] == 'GTO_ADMON') | (data_egresos['Categoría'] == 'GTO_OPERATIVO')
+data_admin_oper = data_egresos[filtro_admon_oper]
+data_admin_oper['month'] = data_admin_oper['Fecha'].dt.month
 ## Comisiones MP
 
 filtro_gto_oper_comisiones_mp = data_egresos_gto_admin['Subcategoría'] == 'COMISIONES OTRO MP'
@@ -294,8 +298,47 @@ if page == 'Datos Financieros':
         ventas_finalizacion_pivot
 
     if financial_option == 'Control de gastos':
-        cat_gastos = ['Administrativos', 'Operativos']
+        cat_gastos = ['Administrativos y Operativos Acumulados' ,'Administrativos', 'Operativos']
         cat = st.radio('Gastos:', cat_gastos, index=None)
+        if cat == 'Administrativos y Operativos Acumulados':
+            # Apartado para visualizar gastos administrativos y operativos juntos
+            gto_admon_oper_pivot = pd.pivot_table(data_admin_oper,
+                                                  index='month',
+                                                  values='Monto',
+                                                  aggfunc='sum')
+            st.subheader('Gastos **Administrativos y Operativos**:', divider='red')
+            fig22 = px.line(gto_admon_oper_pivot,
+                            y='Monto',
+                            title='Gastos Acumulados',
+                            markers=True,
+                            line_shape='spline',
+                            text='Monto',
+                            labels={'month': 'meses'})
+            fig22.update_layout(yaxis=dict(showgrid=False))
+            fig22.update_traces(textposition='top center',
+                           texttemplate='$%{text:,.0f}',
+                           line=dict(color='#FF0000'))
+            st.plotly_chart(fig22)
+            # aplicando formato de moneda
+            gto_admon_oper_pivot['Monto'] = gto_admon_oper_pivot['Monto'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_oper_pivot
+            # gráfico por categoría admin y operativo
+            gto_admon_oper_div_pivot = pd.pivot_table(data_admin_oper,
+                                                      index='month',
+                                                      columns=['Categoría'],
+                                                      values='Monto',
+                                                      aggfunc='sum')
+            fig23 = px.line(gto_admon_oper_div_pivot,
+                            labels={'month': 'mes',
+                                    'value': 'monto'},
+                            markers=True,
+                            title='Gastos Administrativos y Operativos')
+            st.plotly_chart(fig23)
+            # aplicando formato de moneda
+            gto_admon_oper_div_pivot['GTO_ADMON'] = gto_admon_oper_div_pivot['GTO_ADMON'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_oper_div_pivot['GTO_OPERATIVO'] = gto_admon_oper_div_pivot['GTO_OPERATIVO'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_oper_div_pivot
+            # nombre del dataframe filtrado por gto admin y oper: data_admin_oper
         if cat == 'Administrativos':
             # rellenando los valores None
             gto_admon_pivot['Enero'] = gto_admon_pivot['Enero'].fillna(0)
