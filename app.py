@@ -1,8 +1,9 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-import matplotlib
+import matplotlib.pyplot as plt
 from calendar import month_name
+import seaborn as sns
 
 month_lookup = list(month_name)
 
@@ -296,7 +297,10 @@ if page == 'Datos Financieros':
         st.plotly_chart(fig5)
         ventas_finalizacion_pivot['VENTA'] = ventas_finalizacion_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_finalizacion_pivot
-
+        # boxplot ventas
+        caja, ax1 = plt.subplots()
+        sns.boxplot(x='TIPO VENTA', y='VENTA', data=data_ventas)
+        st.pyplot(caja)
     if financial_option == 'Control de gastos':
         cat_gastos = ['Administrativos y Operativos Acumulados' ,'Administrativos', 'Operativos']
         cat = st.radio('Gastos:', cat_gastos, index=None)
@@ -781,7 +785,3 @@ if page == 'Datos Operativos':
         destajo_pivot_1['PZAS'] = destajo_pivot_1['PZAS'].apply(lambda x: '{:,.0f}'.format(x))
         destajo_pivot_1
 
-# import seaborn as sns
-
-# cm = sns.light_palette("green", as_cmap=True)
-# st.dataframe(gto_admon_pivot.style.background_gradient(cmap=cm), column_order=('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'))
