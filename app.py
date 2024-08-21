@@ -297,10 +297,20 @@ if page == 'Datos Financieros':
         st.plotly_chart(fig5)
         ventas_finalizacion_pivot['VENTA'] = ventas_finalizacion_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
         ventas_finalizacion_pivot
+        # añadiendo boxplots de las ventas residenciales y en serie
+        st.divider()
+        # obteniendo ventas residencial
+        ventas_residencial = data_ventas[data_ventas['TIPO PROYECTO'] == 'RESIDENCIAL']
+        ventas_serie = data_ventas[data_ventas['TIPO PROYECTO'] == 'SERIE']
         # boxplot ventas
+        st.subheader('Distribución de ventas residenciales')
         caja, ax1 = plt.subplots()
-        sns.boxplot(x='TIPO VENTA', y='VENTA', data=data_ventas)
+        sns.boxplot(x='TIPO VENTA', y='VENTA', data=ventas_residencial)
         st.pyplot(caja)
+        st.subheader('Distribución de ventas en serie')
+        caja2, ax2 = plt.subplots()
+        sns.boxplot(x='TIPO VENTA', y='VENTA', data=ventas_serie)
+        st.pyplot(caja2)
     if financial_option == 'Control de gastos':
         cat_gastos = ['Administrativos y Operativos Acumulados' ,'Administrativos', 'Operativos']
         cat = st.radio('Gastos:', cat_gastos, index=None)
