@@ -193,6 +193,11 @@ data_prod_2024['month'] = data_prod_2024['Fecha'].dt.month
 data_prod_2024_real = data_prod_2024[data_prod_2024['Fecha'].dt.month >= 4]
 data_prod_2024_real['PRODUCIDOS'] = data_prod_2024_real['PRODUCIDOS'].astype(int)
 
+## Costo Materia Prima
+cto_mp = pd.read_excel('./datasets/materia_prima.xlsx')
+cto_mp['FECHA'] = pd.to_datetime(cto_mp['FECHA'])
+cto_mp['mes'] = cto_mp['FECHA'].dt.month
+
 if page == 'Datos Financieros':
     financieros = ['Ventas', 'Control de gastos', 'Estado de Resultados']
     st.subheader(page)
@@ -593,6 +598,26 @@ if page == 'Datos Financieros':
             # mostrando el DataFrame
             gto_oper_pivot
             st.subheader('Gastos: Operativos', divider='red')
+            st.write('Costo MP')
+            cto_mp_pivot = pd.pivot_table(cto_mp,
+                                          index='mes',
+                                          values='MONTO',
+                                          aggfunc='sum')
+            fig24 = px.line(cto_mp_pivot,
+                            y='MONTO',
+                            markers=True,
+                            line_shape='spline',
+                            text='MONTO')
+            fig24.update_layout(yaxis=dict(showgrid=False),
+                                title={'text': "Costo Materia Prima",
+                                    'y': 0.9,  # Alineación vertical
+                                    'x': 0.5,  # Alineación horizontal
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'})
+            fig24.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
+            st.plotly_chart(fig24)
+            cto_mp_pivot['MONTO'] = cto_mp_pivot['MONTO'].apply(lambda x: '${:,.0f}'.format(x))
+            cto_mp_pivot
             st.write('Destajo')
             costo_destajo = pd.pivot_table(destajo_2024,
                                            values='TOTAL DESTAJO',
