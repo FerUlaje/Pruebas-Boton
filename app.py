@@ -814,6 +814,28 @@ if page == 'Datos Operativos':
                                     margins=all,
                                     margins_name='Total')
         st.dataframe(prod_pivot_1)
+        st.subheader('Correlación Horas Extras y ML Producidos')
+        prod_sem_14 = data_prod_2024_real[data_prod_2024_real['Semana'] >= 14]
+        prod_sem_14_pivot = pd.pivot_table(prod_sem_14,
+                                            values='PRODUCIDOS',
+                                            index='Semana',
+                                            aggfunc='sum')
+        prod_sem_14_pivot.rename_axis('semana', inplace=True)
+        horas_extras_sem_14 = horas_extras[horas_extras['semana'] >= 14]
+        horas_extras_sem_14_pivot = pd.pivot_table(horas_extras_sem_14,
+                                            values='costo',
+                                            index='semana',
+                                            aggfunc=sum)
+        correlacion_hrs_prod = pd.merge(prod_sem_14_pivot, horas_extras_sem_14_pivot, on='semana')
+        #correlation_matrix = correlacion_hrs_prod.corr()
+        # Selecciona las variables del DataFrame
+        x_col = st.selectbox("Selecciona la columna para el eje X:", correlacion_hrs_prod.columns)
+        y_col = st.selectbox("Selecciona la columna para el eje Y:", correlacion_hrs_prod.columns)
+        # Creando gráfico
+        fig, ax = plt.subplots()
+        sns.scatterplot(x=correlacion_hrs_prod[x_col], y=correlacion_hrs_prod[y_col], ax=ax, palette='viridis')
+        st.pyplot(fig)
+        correlacion_hrs_prod
     if operation_option == 'Instalación':
         st.subheader('Datos de Instalación', divider='rainbow')
         destajo_3 = pd.pivot_table(destajo_2024,
