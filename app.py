@@ -579,7 +579,7 @@ if page == 'Datos Financieros':
             # mostrando el DataFrame
             gto_oper_pivot
             st.subheader('Gastos: Operativos', divider='red')
-            st.write('Costo MP')
+
             cto_mp_pivot = pd.pivot_table(cto_mp,
                                           index='mes',
                                           values='MONTO',
@@ -597,9 +597,10 @@ if page == 'Datos Financieros':
                                     'yanchor': 'top'})
             fig24.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig24)
-            cto_mp_pivot['MONTO'] = cto_mp_pivot['MONTO'].apply(lambda x: '${:,.0f}'.format(x))
-            cto_mp_pivot
-            st.write('Destajo')
+            cto_mp_pivot_total = cto_mp_pivot['MONTO'].sum()
+            cto_mp_pivot_formato = "${:,.0f}".format(cto_mp_pivot_total)
+            st.write('Costo total de Materia Prima: ', cto_mp_pivot_formato)
+
             costo_destajo = pd.pivot_table(destajo_2024,
                                            values='TOTAL DESTAJO',
                                            index='SEMANA',
@@ -628,7 +629,7 @@ if page == 'Datos Financieros':
                                            margins_name='Total')
             costo_destajo_1['TOTAL DESTAJO'] = costo_destajo_1['TOTAL DESTAJO'].apply(lambda x: '${:,.0f}'.format(x))
             costo_destajo_1
-            st.write('Horas Extras')
+
             horas_extras_pivot = pd.pivot_table(horas_extras,
                                                 values='costo',
                                                 index='semana',
@@ -648,15 +649,11 @@ if page == 'Datos Financieros':
                                 })
             fig7.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig7)
-            horas_extras_pivot_1 = pd.pivot_table(horas_extras,
-                                                values='costo',
-                                                index='semana',
-                                                aggfunc='sum',
-                                                margins=True,
-                                                margins_name='Total')
-            horas_extras_pivot_1['costo'] = horas_extras_pivot_1['costo'].apply(lambda x: '${:,.0f}'.format(x))
-            horas_extras_pivot_1
-            st.write('Gasolina')
+ 
+            horas_extras_pivot_total = horas_extras_pivot['costo'].sum()
+            horas_extras_pivot_formato = "${:,.0f}".format(horas_extras_pivot_total)
+            st.write('Costo total de Horas Extras: ', horas_extras_pivot_formato)
+
             gasolina_pivot = pd.pivot_table(gasolina,
                                             values='Monto',
                                             index='month',
@@ -676,15 +673,11 @@ if page == 'Datos Financieros':
                                 })
             fig13.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig13)
-            gasolina_pivot_1 = pd.pivot_table(gasolina,
-                                              index='month',
-                                              values='Monto',
-                                              aggfunc='sum',
-                                              margins=True,
-                                              margins_name='Total')
-            gasolina_pivot_1['Monto'] = gasolina_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
-            gasolina_pivot_1
-            st.write('Servicios Autos')
+
+            gasolina_pivot__total = gasolina_pivot['Monto'].sum()
+            gasolina_pivot_formato = "${:,.0f}".format(gasolina_pivot__total)
+            st.write('Costo total de Gasolina: ', gasolina_pivot_formato)
+            
             servicio_autos_pivot = pd.pivot_table(servicio_autos,
                                                   index='month',
                                                   values='Monto',
@@ -705,14 +698,10 @@ if page == 'Datos Financieros':
             fig14.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig14)
             # mostrando tabla dinámica con totales
-            servicio_autos_pivot_1 = pd.pivot_table(servicio_autos,
-                                              index='month',
-                                              values='Monto',
-                                              aggfunc='sum',
-                                              margins=True,
-                                              margins_name='Total')
-            servicio_autos_pivot_1['Monto'] = servicio_autos_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
-            servicio_autos_pivot_1
+ 
+            servicio_autos_pivot_total = servicio_autos_pivot['Monto'].sum()
+            servicio_autos_pivot_formato = "${:,.0f}".format(servicio_autos_pivot_total)
+            st.write('Costo total por Servicios de Autos: ', servicio_autos_pivot_formato)
     if financial_option == 'Estado de Resultados':
         st.subheader('Estado de Resultados', divider='red')
         st.image('./edo_resultados/edo_resultados_acum_septiembre.png', caption='Estado de Resultados Acumulado 2024')
