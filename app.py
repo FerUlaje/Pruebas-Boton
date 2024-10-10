@@ -215,10 +215,9 @@ if page == 'Datos Financieros':
         fig6.update_traces(textposition='outside',
                            texttemplate='$%{text:,.0f}')
         st.plotly_chart(fig6)
-        ventas_total_por_mes_con_total['VENTA'] = ventas_total_por_mes_con_total['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
-        ventas_total_por_mes_con_total
-        
-        st.write('Ventas por **Cierre de Trato**: ', ventas_cierre_trato.astype(int))
+        ventas_total = ventas_total_por_mes['VENTA'].sum()
+        ventas_total_formato = "${:,.0f}".format(ventas_total)
+        st.write('Ventas totales 2024: ', ventas_total_formato)
         fig = px.line(ventas_cierre_trato_pivot, 
                       y='VENTA', 
                       title='Ventas Cierre Trato', 
@@ -232,10 +231,9 @@ if page == 'Datos Financieros':
                           texttemplate='$%{text:,.0f}',
                           line=dict(color='#00FF00'))
         st.plotly_chart(fig)
-        ventas_cierre_trato_pivot['VENTA'] =ventas_cierre_trato_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
-        ventas_cierre_trato_pivot
-
-        st.write('Ventas por **Entrega de Diseño**:', ventas_entrega_diseño.astype(int))
+        ventas_cierre_trato_total = ventas_cierre_trato_pivot['VENTA'].sum()
+        ventas_cierre_trato_formato = "${:,.0f}".format(ventas_cierre_trato_total)
+        st.write('Ventas totales por Cierre de Trato: ', ventas_cierre_trato_formato)
         fig2 = px.line(ventas_entrega_diseño_pivot, 
                        y='VENTA', 
                        title='Ventas Entrega Diseño', 
@@ -249,10 +247,10 @@ if page == 'Datos Financieros':
                            texttemplate='$%{text:,.0f}',
                           line=dict(color='#00FF00'))
         st.plotly_chart(fig2)
-        ventas_entrega_diseño_pivot['VENTA'] = ventas_entrega_diseño_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
-        ventas_entrega_diseño_pivot
+        ventas_entrega_diseño_total = ventas_entrega_diseño_pivot['VENTA'].sum()
+        ventas_entrega_diseño_formato = "${:,.0f}".format(ventas_entrega_diseño_total)
+        st.write('Ventas totales por Entrega de Diseño: ', ventas_entrega_diseño_formato)
 
-        st.write('Ventas por **Inicio de Producción**:', ventas_inicio_prod.astype(int))
         fig3 = px.line(ventas_inicio_prod_pivot, 
                        y='VENTA', 
                        title='Ventas Inicio Producción', 
@@ -266,10 +264,10 @@ if page == 'Datos Financieros':
                            texttemplate='$%{text:,.0f}',
                           line=dict(color='#00FF00'))
         st.plotly_chart(fig3)
-        ventas_inicio_prod_pivot['VENTA'] = ventas_inicio_prod_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
-        ventas_inicio_prod_pivot
+        ventas_inicio_prod_total = ventas_inicio_prod_pivot['VENTA'].sum()
+        ventas_inicio_prod_formato = "${:,.0f}".format(ventas_inicio_prod_total)
+        st.write('Ventas totales por Inicio Producción: ', ventas_inicio_prod_formato)
 
-        st.write('Ventas por **Inicio de Instalación**:', ventas_inicio_instal.astype(int))
         fig4 = px.line(ventas_inicio_instal_pivot, 
                        y='VENTA', 
                        title='Ventas Inicio Instalación', 
@@ -283,10 +281,10 @@ if page == 'Datos Financieros':
                            texttemplate='$%{text:,.0f}',
                            line=dict(color='#00FF00'))
         st.plotly_chart(fig4)
-        ventas_inicio_instal_pivot['VENTA'] = ventas_inicio_instal_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
-        ventas_inicio_instal_pivot
+        ventas_inicio_instal_total = ventas_inicio_instal_pivot['VENTA'].sum()
+        ventas_inicio_instal_formato = "${:,.0f}".format(ventas_inicio_instal_total)
+        st.write('Ventas totales por Inicio Instalación: ', ventas_inicio_instal_formato)
 
-        st.write('Ventas por **Finalización**:', ventas_finalizacion.astype(int))
         fig5 = px.line(ventas_finalizacion_pivot, 
                        y='VENTA', 
                        title='Ventas Finalización', 
@@ -300,8 +298,9 @@ if page == 'Datos Financieros':
                            texttemplate='$%{text:,.0f}',
                            line=dict(color='#00FF00'))
         st.plotly_chart(fig5)
-        ventas_finalizacion_pivot['VENTA'] = ventas_finalizacion_pivot['VENTA'].apply(lambda x: '${:,.0f}'.format(x))
-        ventas_finalizacion_pivot
+        ventas_finalizacion_total = ventas_finalizacion_pivot['VENTA'].sum()
+        ventas_finaizacion_formato = "${:,.0f}".format(ventas_finalizacion_total)
+        st.write('Ventas totales por Finalización: ', ventas_finaizacion_formato)
         # añadiendo boxplots de las ventas residenciales y en serie
         st.divider()
         # obteniendo ventas residencial
