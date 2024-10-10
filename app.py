@@ -337,9 +337,10 @@ if page == 'Datos Financieros':
                            texttemplate='$%{text:,.0f}',
                            line=dict(color='#FF0000'))
             st.plotly_chart(fig22)
-            # aplicando formato de moneda
-            gto_admon_oper_pivot['Monto'] = gto_admon_oper_pivot['Monto'].apply(lambda x: '${:,.0f}'.format(x))
-            gto_admon_oper_pivot
+            # obteniendo total de gastos administrativos y operativos con formato
+            gto_admon_oper__total = gto_admon_oper_pivot['Monto'].sum()
+            gto_admon_oper_formato = "${:,.0f}".format(gto_admon_oper__total)
+            st.write('Total de Gastos Administrativos y Operativos: ', gto_admon_oper_formato)
             # gráfico por categoría admin y operativo
             gto_admon_oper_div_pivot = pd.pivot_table(data_admin_oper,
                                                       index='month',
