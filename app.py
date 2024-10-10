@@ -791,6 +791,8 @@ if page == 'Datos Operativos':
                                             index='semana',
                                             aggfunc=sum)
         correlacion_hrs_prod = pd.merge(prod_sem_14_pivot, horas_extras_sem_14_pivot, on='semana')
+        correlacion_hrs_prod = correlacion_hrs_prod.rename(columns={'costo': 'Costo Hrs Extras',
+                                                                    'PRODUCIDOS': 'ML Producidos'})
         #correlation_matrix = correlacion_hrs_prod.corr()
         # Selecciona las variables del DataFrame
         x_col = st.selectbox("Selecciona la columna para el eje X:", correlacion_hrs_prod.columns)
@@ -829,4 +831,19 @@ if page == 'Datos Operativos':
         destajo_pivot_1['DIA'] = destajo_pivot_1['DIA'].apply(lambda x: '{:,.0f}'.format(x))
         destajo_pivot_1['PZAS'] = destajo_pivot_1['PZAS'].apply(lambda x: '{:,.0f}'.format(x))
         destajo_pivot_1
-
+        destajo_3_total = destajo_3['DIA'] + destajo_3['ML'] + destajo_3['PZAS']
+        destajo_3_total.name = 'total_instalado'
+        costo_destajo_semana = pd.pivot_table(destajo_2024,
+                                        index='SEMANA',
+                                        values='TOTAL DESTAJO',
+                                        aggfunc='sum')
+        union = pd.merge(costo_destajo_semana, destajo_3_total, on='SEMANA')
+        union = union.rename(columns={'TOTAL DESTAJO': 'Costo Destajo',
+                                        'total_instalado': 'ML, Días y Pzas Instaladas'})
+        x_col = st.selectbox("Selecciona la columna para el eje X:", union.columns)
+        y_col = st.selectbox("Selecciona la columna para el eje Y:", union.columns)
+        # Creando gráfico
+        fig, ax = plt.subplots()
+        sns.scatterplot(x=union[x_col], y=union[y_col], ax=ax, palette='viridis')
+        st.pyplot(fig)
+        union
