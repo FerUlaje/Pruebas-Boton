@@ -837,13 +837,13 @@ if page == 'Datos Operativos':
                                         index='SEMANA',
                                         values='TOTAL DESTAJO',
                                         aggfunc='sum')
-        union = pd.merge(costo_destajo_semana, destajo_3_total, on='SEMANA')
-        union = union.rename(columns={'TOTAL DESTAJO': 'Costo Destajo',
+        costo_instal_destajo = pd.merge(costo_destajo_semana, destajo_3_total, on='SEMANA')
+        costo_instal_destajo = costo_instal_destajo.rename(columns={'TOTAL DESTAJO': 'Costo Destajo',
                                         'total_instalado': 'ML, Días y Pzas Instaladas'})
-        x_col = st.selectbox("Selecciona la columna para el eje X:", union.columns)
-        y_col = st.selectbox("Selecciona la columna para el eje Y:", union.columns)
+        x_col = st.selectbox("Selecciona la columna para el eje X:", costo_instal_destajo.columns)
+        y_col = st.selectbox("Selecciona la columna para el eje Y:", costo_instal_destajo.columns)
         # Creando gráfico
         fig, ax = plt.subplots()
-        sns.scatterplot(x=union[x_col], y=union[y_col], ax=ax, palette='viridis')
+        sns.scatterplot(x=costo_instal_destajo[x_col], y=costo_instal_destajo[y_col], ax=ax, palette='viridis')
         st.pyplot(fig)
-        union
+        costo_instal_destajo
