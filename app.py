@@ -726,7 +726,11 @@ if page == 'Datos Operativos':
                                 })
         fig15.update_traces(textposition='top center', line=dict(color='#FF0000'))
         st.plotly_chart(fig15)
-        diseño_pivot
+        # obteniendo el total de ML
+        diseño_pivot_total = diseño_pivot['ML Realizados'].sum()
+        # dando formato al total de ML
+        diseño_pivot_format = "{:,.0f}".format(diseño_pivot_total)
+        st.write('ML Totales Entregados a Clientes: ', diseño_pivot_format)
         st.subheader('ML Entregados a Producción', divider='rainbow')
         fig16 = px.line(diseño_pivot_prod,
                         y='ML Realizados',
@@ -743,7 +747,9 @@ if page == 'Datos Operativos':
                                 })
         fig16.update_traces(textposition='top center', line=dict(color='#FF0000'))
         st.plotly_chart(fig16)
-        diseño_pivot_prod
+        diseño_pivot_prod_total = diseño_pivot_prod['ML Realizados'].sum()
+        diseño_pivot_prod_format = "{:,.0f}".format(diseño_pivot_prod_total)
+        st.write('ML Totales Entregados a Producción: ', diseño_pivot_prod_format)
     if operation_option == 'Producción':
         st.subheader('Total Metros Lineales Producidos', divider='red')
         prod_pivot = pd.pivot_table(data_prod_2024_real,
