@@ -415,7 +415,6 @@ if page == 'Datos Financieros':
             gto_admon_pivot['Septiembre'] = gto_admon_pivot['Septiembre'].apply(lambda x: '${:,.0f}'.format(x))
             gto_admon_pivot['%8'] = gto_admon_pivot['%8'].apply(lambda x: f'{x:.0%}')
             gto_admon_pivot
-            st.write('Comisiones MP:')
             comisiones_admin_mp = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
                                                  values='Monto',
                                                  index='month',
@@ -429,17 +428,11 @@ if page == 'Datos Financieros':
             fig8.update_layout(yaxis=dict(showgrid=False))
             fig8.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig8)
-            # mostrar tabla dinámica con totales
-            comisiones_admin_mp_1 = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
-                                                 values='Monto',
-                                                 index='month',
-                                                 aggfunc='sum',
-                                                 margins=True,
-                                                 margins_name='Total')
             # aplicando formato de moneda
-            comisiones_admin_mp_1['Monto'] = comisiones_admin_mp_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
-            comisiones_admin_mp_1
-            st.write('IMSS/INFONAVIT:')
+            comisiones_admin_mp_total = comisiones_admin_mp['Monto'].sum()
+            comisiones_admin_mp_formato = "${:,.0f}".format(comisiones_admin_mp_total)
+            st.write('Costo total por Comisiones Otro MP: ', comisiones_admin_mp_formato)
+
             imss_pivot = pd.pivot_table(egresos_admin_imss,
                                         values='Monto',
                                         index='month',
@@ -453,17 +446,11 @@ if page == 'Datos Financieros':
             fig9.update_layout(yaxis=dict(showgrid=False))
             fig9.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig9)
-            # mostrar tabla dinámica con totales
-            imss_pivot_1 = pd.pivot_table(egresos_admin_imss,
-                                        values='Monto',
-                                        index='month',
-                                        aggfunc='sum',
-                                        margins=True,
-                                        margins_name='Total')
             # aplicando formato de moneda
-            imss_pivot_1['Monto'] = imss_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
-            imss_pivot_1
-            st.write('Finiquitos/Primas:')
+            imss_pivot_total = imss_pivot['Monto'].sum()
+            imss_pivot_formato = "${:,.0f}".format(imss_pivot_total)
+            st.write('Costo toal por IMSS, INFONAVIT y FONACOT: ', imss_pivot_formato)
+
             finiquitos_pivot = pd.pivot_table(egresos_finiquitos,
                                               values='Monto',
                                               index='month',
@@ -483,17 +470,11 @@ if page == 'Datos Financieros':
                                 })
             fig10.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig10)
-            # mostrar tabla dinámica con totales
-            finiquitos_pivot_1 = pd.pivot_table(egresos_finiquitos,
-                                              values='Monto',
-                                              index='month',
-                                              aggfunc='sum',
-                                              margins=True,
-                                              margins_name='Total')
             # aplicando formato de monda
-            finiquitos_pivot_1['Monto'] = finiquitos_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
-            finiquitos_pivot_1
-            st.write('Oficinas:')
+            finiquitos_pivot_total = finiquitos_pivot['Monto'].sum()
+            finiquitos_pivot_formato = "${:,.0f}".format(finiquitos_pivot_total)
+            st.write('Costo total por Finiquito y Primas Vacacionales: ', finiquitos_pivot_formato)
+
             oficinas_pivot = pd.pivot_table(egresos_oficinas,
                                             values='Monto',
                                             index='month',
@@ -513,17 +494,11 @@ if page == 'Datos Financieros':
                                 })
             fig11.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig11)
-            # mostrando tabla dinámica con totales totales
-            oficinas_pivot_1 = pd.pivot_table(egresos_oficinas,
-                                            values='Monto',
-                                            index='month',
-                                            aggfunc='sum',
-                                            margins=True,
-                                            margins_name='Total')
-            # aplicando formato de moneda
-            oficinas_pivot_1['Monto'] = oficinas_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
-            oficinas_pivot_1
-            st.write('Bonos:')
+
+            oficinas_pivot_total = oficinas_pivot['Monto'].sum()
+            oficinas_pivot_formato = "${:,.0f}".format(oficinas_pivot_total)
+            st.write('Costo total por Gastos de Oficina: ', oficinas_pivot_formato)
+
             bonos_admin_pivot = pd.pivot_table(bonos_admin,
                                                values='Monto',
                                                index='month',
@@ -543,16 +518,10 @@ if page == 'Datos Financieros':
                                 })
             fig12.update_traces(textposition='top center', line=dict(color='#FF0000'), texttemplate='$%{text:,.0f}')
             st.plotly_chart(fig12)
-            # mostrando tabla dinámica con totales
-            bonos_admin_pivot_1 = pd.pivot_table(bonos_admin,
-                                               values='Monto',
-                                               index='month',
-                                               aggfunc='sum',
-                                               margins=True,
-                                               margins_name='Total')
-            # aplicando formato moneda
-            bonos_admin_pivot_1['Monto'] = bonos_admin_pivot_1['Monto'].apply(lambda x: '${:,.0f}'.format(x))
-            bonos_admin_pivot_1
+
+            bonos_admin_total = bonos_admin_pivot['Monto'].sum()
+            bonos_admin_formato = "${:,.0f}".format(bonos_admin_total)
+            st.write('Costo total por Bonos Administrativos: ', bonos_admin_formato)
         if cat == 'Operativos':
             gto_oper_pivot['Enero'] = gto_oper_pivot['Enero'].fillna(0)
             gto_oper_pivot['Febrero'] = gto_oper_pivot['Febrero'].fillna(0)
