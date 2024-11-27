@@ -369,6 +369,7 @@ if page == 'Datos Financieros':
             gto_admon_pivot['Julio'] = gto_admon_pivot['Julio'].fillna(0)
             gto_admon_pivot['Agosto'] = gto_admon_pivot['Agosto'].fillna(0)
             gto_admon_pivot['Septiembre'] = gto_admon_pivot['Septiembre'].fillna(0)
+            gto_admon_pivot['Octubre'] = gto_admon_pivot['Octubre'].fillna(0)
             # cambio porcentual 1
             gto_admon_pivot['%1'] = (gto_admon_pivot['Febrero'] / gto_admon_pivot['Enero']) -1
             gto_admon_pivot['%1'] = gto_admon_pivot['%1'].fillna(0)
@@ -393,10 +394,13 @@ if page == 'Datos Financieros':
             # cambio porcentual 8
             gto_admon_pivot['%8'] = (gto_admon_pivot['Septiembre'] / gto_admon_pivot['Agosto']) -1
             gto_admon_pivot['%8'] = gto_admon_pivot['%8'].fillna(0)
+            # cambio porcentual 9
+            gto_admon_pivot['%9'] = (gto_admon_pivot['Octubre'] / gto_admon_pivot['Septiembre']) -1
+            gto_admon_pivot['%9'] = gto_admon_pivot['%9'].fillna(0)
             # divisor
             st.subheader('Gastos: Administrativos', divider='red')
             # aplicando formato de moneda
-            gto_admon_pivot = gto_admon_pivot[['Enero', 'Febrero', '%1', 'Marzo', '%2', 'Abril', '%3', 'Mayo', '%4', 'Junio', '%5', 'Julio', '%6', 'Agosto', '%7', 'Septiembre', '%8']]
+            gto_admon_pivot = gto_admon_pivot[['Enero', 'Febrero', '%1', 'Marzo', '%2', 'Abril', '%3', 'Mayo', '%4', 'Junio', '%5', 'Julio', '%6', 'Agosto', '%7', 'Septiembre', '%8', 'Octubre', '%9']]
             gto_admon_pivot['Enero'] = gto_admon_pivot['Enero'].apply(lambda x: '${:,.0f}'.format(x))
             gto_admon_pivot['Febrero'] = gto_admon_pivot['Febrero'].apply(lambda x: '${:,.0f}'.format(x))
             gto_admon_pivot['%1'] = gto_admon_pivot['%1'].apply(lambda x: f'{x:.0%}')
@@ -414,6 +418,8 @@ if page == 'Datos Financieros':
             gto_admon_pivot['%7'] = gto_admon_pivot['%7'].apply(lambda x: f'{x:.0%}')
             gto_admon_pivot['Septiembre'] = gto_admon_pivot['Septiembre'].apply(lambda x: '${:,.0f}'.format(x))
             gto_admon_pivot['%8'] = gto_admon_pivot['%8'].apply(lambda x: f'{x:.0%}')
+            gto_admon_pivot['Octubre'] = gto_admon_pivot['Octubre'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_admon_pivot['%9'] = gto_admon_pivot['%9'].apply(lambda x: f'{x:.0%}')
             gto_admon_pivot
             comisiones_admin_mp = pd.pivot_table(data_egresos_gto_admin_comisiones_mp,
                                                  values='Monto',
@@ -532,6 +538,7 @@ if page == 'Datos Financieros':
             gto_oper_pivot['Julio'] = gto_oper_pivot['Julio'].fillna(0)
             gto_oper_pivot['Agosto'] = gto_oper_pivot['Agosto'].fillna(0)
             gto_oper_pivot['Septiembre'] = gto_oper_pivot['Septiembre'].fillna(0)
+            gto_oper_pivot['Octubre'] = gto_oper_pivot['Octubre'].fillna(0)
             # cambio porcentual 1
             gto_oper_pivot['%1'] = (gto_oper_pivot['Febrero'] / gto_oper_pivot['Enero'] -1)
             gto_oper_pivot['%1'] = gto_oper_pivot['%1'].fillna(0)
@@ -556,8 +563,11 @@ if page == 'Datos Financieros':
             # cambio porcentual 8
             gto_oper_pivot['%8'] = (gto_oper_pivot['Septiembre'] / gto_oper_pivot['Agosto'] -1)
             gto_oper_pivot['%8'] = gto_oper_pivot['%8'].fillna(0)
+            # cambio porcentual 9
+            gto_oper_pivot['%9'] = (gto_oper_pivot['Octubre'] / gto_oper_pivot['Septiembre'] -1)
+            gto_oper_pivot['%9'] = gto_oper_pivot['%9'].fillna(0)
             # reordenando el DataFrame
-            gto_oper_pivot = gto_oper_pivot[['Enero', 'Febrero', '%1', 'Marzo', '%2', 'Abril', '%3', 'Mayo', '%4', 'Junio', '%5', 'Julio', '%6', 'Agosto', '%7', 'Septiembre', '%8']]
+            gto_oper_pivot = gto_oper_pivot[['Enero', 'Febrero', '%1', 'Marzo', '%2', 'Abril', '%3', 'Mayo', '%4', 'Junio', '%5', 'Julio', '%6', 'Agosto', '%7', 'Septiembre', '%8', 'Octubre', '%9']]
             # aplicando formato de moneda y porcentaje
             gto_oper_pivot['Enero'] = gto_oper_pivot['Enero'].apply(lambda x: '${:,.0f}'.format(x))
             gto_oper_pivot['Febrero'] = gto_oper_pivot['Febrero'].apply(lambda x: '${:,.0f}'.format(x))
@@ -576,6 +586,8 @@ if page == 'Datos Financieros':
             gto_oper_pivot['%7'] = gto_oper_pivot['%7'].apply(lambda x: f'{x:.0%}')
             gto_oper_pivot['Septiembre'] = gto_oper_pivot['Septiembre'].apply(lambda x: '${:,.0f}'.format(x))
             gto_oper_pivot['%8'] = gto_oper_pivot['%8'].apply(lambda x: f'{x:.0%}')
+            gto_oper_pivot['Octubre'] = gto_oper_pivot['Octubre'].apply(lambda x: '${:,.0f}'.format(x))
+            gto_oper_pivot['%9'] = gto_oper_pivot['%9'].apply(lambda x: f'{x:.0%}')
             # mostrando el DataFrame
             gto_oper_pivot
             st.subheader('Gastos: Operativos', divider='red')
