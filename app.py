@@ -208,7 +208,7 @@ if page == 'Datos Financieros':
                       y = 'VENTA',
                       title='Total Ventas 2024', 
                       text='VENTA',
-                      labels={ 'VENTA': 'ventas',
+                      labels={ 'VENTA': 'Ventas',
                               'month': 'mes'},
                     color_discrete_sequence=['green'])
         fig6.update_layout(yaxis=dict(showgrid=False))
